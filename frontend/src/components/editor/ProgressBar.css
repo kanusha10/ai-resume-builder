@@ -1,0 +1,29 @@
+.progress-wrapper {
+  margin-bottom: 28px;
+}
+
+.progress-top {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  color: #667085;
+  font-size: 12px;
+}
+
+.progress-top strong {
+  color: #5b5bd6;
+}
+
+.progress-track {
+  height: 5px;
+  border-radius: 10px;
+  background: #e8e9f0;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: #5b5bd6;
+  transition: width 0.25s ease;
+}

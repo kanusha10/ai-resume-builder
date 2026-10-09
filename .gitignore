@@ -1,0 +1,21 @@
+# Environment files and secrets
+.env
+.env.*
+!.env.example
+
+# Build and dependency files
+**/target/
+**/node_modules/
+**/dist/
+
+# IDE files
+.idea/
+.vscode/
+*.iml
+
+# Logs
+*.log
+
+# Private uploaded resumes
+uploads/
+private-resumes/

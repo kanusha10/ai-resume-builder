@@ -1,0 +1,245 @@
+.hero-section {
+  padding: 3rem 1.5rem 3.5rem;
+  background-color: #ffffff;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.hero-container {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  align-items: center;
+  gap: 3rem;
+}
+
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.25rem 0.65rem;
+  border-radius: 9999px;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #334155;
+  margin-bottom: 0.9rem;
+}
+
+.badge-sparkle {
+  color: #4f46e5;
+}
+
+.hero-title {
+  font-size: 2.65rem;
+  line-height: 1.2;
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: -0.03em;
+  margin: 0 0 1rem;
+}
+
+.highlight-text {
+  background: linear-gradient(135deg, #4f46e5 0%, #0284c7 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.hero-description {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: #64748b;
+  max-width: 480px;
+  margin: 0 0 1.75rem;
+}
+
+.hero-cta-group {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.75rem;
+}
+
+.btn-hero-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.7rem 1.35rem;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: #ffffff;
+  text-decoration: none;
+  border-radius: 8px;
+  background: #0f172a;
+  transition: all 0.15s ease;
+}
+
+.btn-hero-primary:hover {
+  background: #1e293b;
+}
+
+.btn-hero-secondary {
+  padding: 0.7rem 1.25rem;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: #334155;
+  text-decoration: none;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  transition: all 0.15s ease;
+}
+
+.btn-hero-secondary:hover {
+  background: #f8fafc;
+}
+
+.hero-specs-row {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  font-size: 0.82rem;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.spec-item {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.spec-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: #10b981;
+}
+
+/* Card Mockup */
+.resume-showcase-card {
+  width: 100%;
+  max-width: 420px;
+  background: #ffffff;
+  border-radius: 10px;
+  border: 1px solid #cbd5e1;
+  box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.08);
+  overflow: hidden;
+  margin: 0 auto;
+}
+
+.card-top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0.85rem;
+  background: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
+  font-size: 0.72rem;
+  color: #64748b;
+}
+
+.browser-dots {
+  display: flex;
+  gap: 4px;
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+.dot.red { background: #f87171; }
+.dot.yellow { background: #fbbf24; }
+.dot.green { background: #34d399; }
+
+.mockup-resume-body {
+  padding: 1.2rem;
+  font-size: 0.74rem;
+  color: #1e293b;
+}
+
+.mockup-header-block h3 {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0;
+}
+
+.mockup-role {
+  font-size: 0.75rem;
+  color: #4f46e5;
+  font-weight: 600;
+  margin: 0.1rem 0 0.3rem;
+}
+
+.mockup-contact-line {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  font-size: 0.68rem;
+  color: #64748b;
+  margin-bottom: 0.85rem;
+}
+
+.mockup-section {
+  margin-bottom: 0.75rem;
+}
+
+.mockup-heading {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #0f172a;
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 0.2rem;
+  margin-bottom: 0.35rem;
+}
+
+.mockup-skills-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  font-size: 0.7rem;
+  color: #475569;
+}
+
+.job-title-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.72rem;
+}
+
+.job-date {
+  font-size: 0.66rem;
+  color: #64748b;
+}
+
+.job-company {
+  font-size: 0.68rem;
+  color: #64748b;
+  margin-bottom: 0.2rem;
+}
+
+.mockup-bullets {
+  margin: 0;
+  padding-left: 0.95rem;
+  font-size: 0.68rem;
+  line-height: 1.4;
+  color: #475569;
+}
+
+@media (max-width: 880px) {
+  .hero-container {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .hero-title {
+    font-size: 2.15rem;
+  }
+}

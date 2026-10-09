@@ -1,0 +1,157 @@
+/* Full-width rectangle container */
+.empty-state-rectangle {
+  width: 100%;
+  background: #ffffff;
+  border: 1px solid rgba(226, 232, 240, 0.95);
+  border-radius: 16px;
+  padding: 2.25rem;
+  display: grid;
+  grid-template-columns: 1fr 1.25fr;
+  gap: 2.25rem;
+  align-items: center;
+  box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.04);
+}
+
+/* Left Informational Panel */
+.empty-left-panel {
+  display: flex;
+  flex-direction: column;
+}
+
+.empty-icon-shield {
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%);
+  color: #4f46e5;
+  border: 1px solid rgba(79, 70, 229, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.empty-heading {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: -0.02em;
+  margin: 0 0 0.35rem;
+}
+
+.empty-subheading {
+  font-size: 0.88rem;
+  color: #64748b;
+  line-height: 1.5;
+  margin: 0 0 1.25rem;
+}
+
+.empty-checklist {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.empty-checklist li {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.82rem;
+  color: #475569;
+  font-weight: 500;
+}
+
+.empty-checklist svg {
+  color: #10b981;
+}
+
+/* Right Clickable Cards */
+.empty-right-options {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.empty-option-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.15rem 1.25rem;
+  border-radius: 12px;
+  text-decoration: none;
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.empty-option-card:hover {
+  transform: translateY(-2px);
+  background: #ffffff;
+  border-color: #cbd5e1;
+  box-shadow: 0 10px 20px -4px rgba(15, 23, 42, 0.06);
+}
+
+.empty-option-card.primary-option:hover {
+  border-color: #818cf8;
+}
+
+.option-icon-wrap {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.primary-icon {
+  background: #eef2ff;
+  color: #4f46e5;
+  border: 1px solid rgba(79, 70, 229, 0.12);
+}
+
+.secondary-icon {
+  background: #f0fdf4;
+  color: #16a34a;
+  border: 1px solid rgba(22, 163, 74, 0.15);
+}
+
+.option-text {
+  flex: 1;
+}
+
+.option-text h4 {
+  font-size: 0.96rem;
+  font-weight: 750;
+  color: #0f172a;
+  margin: 0 0 0.15rem;
+}
+
+.option-text p {
+  font-size: 0.82rem;
+  color: #64748b;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.option-arrow {
+  color: #94a3b8;
+  transition: transform 0.15s ease, color 0.15s ease;
+}
+
+.empty-option-card:hover .option-arrow {
+  transform: translateX(3px);
+  color: #0f172a;
+}
+
+@media (max-width: 820px) {
+  .empty-state-rectangle {
+    grid-template-columns: 1fr;
+    gap: 1.75rem;
+    padding: 1.75rem;
+  }
+}

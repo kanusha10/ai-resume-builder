@@ -1,0 +1,17 @@
+# Maven build output
+target/
+
+# Java compiled files
+*.class
+
+# Logs
+*.log
+
+# Local environment files
+.env
+.env.*
+
+# Local and production secrets
+application-local.properties
+application-prod.properties
+secrets.properties

@@ -1,0 +1,108 @@
+.public-navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  z-index: 9999;
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(226, 232, 240, 0.85);
+  box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05);
+  transition: all 0.2s ease-in-out;
+}
+
+.public-navbar-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0.85rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.public-navbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  text-decoration: none;
+  font-weight: 800;
+  font-size: 1.25rem;
+  color: #0f172a;
+  letter-spacing: -0.02em;
+}
+
+.brand-icon-box {
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
+  background: linear-gradient(135deg, #4f46e5 0%, #06b6d4 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
+}
+
+.public-navbar-links {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.public-navbar-links a {
+  text-decoration: none;
+  color: #475569;
+  font-weight: 500;
+  font-size: 0.92rem;
+  transition: color 0.15s ease;
+}
+
+.public-navbar-links a:hover {
+  color: #4f46e5;
+}
+
+.public-navbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.btn-nav-login {
+  padding: 0.45rem 1rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #334155;
+  text-decoration: none;
+  border-radius: 8px;
+  transition: all 0.15s ease;
+}
+
+.btn-nav-login:hover {
+  background-color: #f1f5f9;
+  color: #0f172a;
+}
+
+.btn-nav-register {
+  padding: 0.5rem 1.15rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #ffffff;
+  text-decoration: none;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.25);
+  transition: all 0.2s ease;
+}
+
+.btn-nav-register:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 5px 15px rgba(79, 70, 229, 0.35);
+}
+
+@media (max-width: 768px) {
+  .public-navbar-links {
+    display: none;
+  }
+}

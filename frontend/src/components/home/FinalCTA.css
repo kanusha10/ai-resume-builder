@@ -1,0 +1,44 @@
+.final-cta-section {
+  padding: 3rem 1.5rem 3.5rem;
+  background-color: #f8fafc;
+}
+
+.final-cta-card {
+  background: #0f172a;
+  border-radius: 14px;
+  padding: 2.5rem 1.75rem;
+  text-align: center;
+  color: #ffffff;
+}
+
+.final-cta-card h2 {
+  font-size: 1.75rem;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  margin: 0 0 0.45rem;
+}
+
+.final-cta-card p {
+  font-size: 0.95rem;
+  color: #94a3b8;
+  max-width: 440px;
+  margin: 0 auto 1.5rem;
+}
+
+.btn-cta-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.7rem 1.4rem;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: #0f172a;
+  background: #ffffff;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: background 0.15s ease;
+}
+
+.btn-cta-primary:hover {
+  background: #f1f5f9;
+}

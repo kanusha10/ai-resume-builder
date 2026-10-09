@@ -1,0 +1,176 @@
+/* =========================================
+   CLEAN & MODERN RESUME CARD
+   ========================================= */
+.resume-item-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 1.35rem 1.4rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 1.15rem;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+}
+
+.resume-item-card:hover {
+  transform: translateY(-2px);
+  border-color: #cbd5e1;
+  box-shadow: 0 10px 22px -4px rgba(15, 23, 42, 0.08);
+}
+
+/* Card Header Row */
+.card-header-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+  position: relative;
+}
+
+.card-avatar-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%);
+  color: #4f46e5;
+  border: 1px solid rgba(79, 70, 229, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.card-title-group {
+  flex: 1;
+  min-width: 0;
+}
+
+.card-main-title {
+  font-size: 1.05rem;
+  font-weight: 750;
+  color: #0f172a;
+  margin: 0 0 0.25rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  letter-spacing: -0.015em;
+}
+
+.card-role-line {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.8rem;
+  color: #64748b;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.card-pill-template {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #4338ca;
+  background: #eef2ff;
+  border: 1px solid #c7d2fe;
+  padding: 0.2rem 0.55rem;
+  border-radius: 9999px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* Meta info row */
+.card-meta-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 0.75rem;
+  border-top: 1px solid #f1f5f9;
+  font-size: 0.76rem;
+  color: #64748b;
+}
+
+.meta-info-item {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.card-status-dot {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #059669;
+}
+
+.card-status-dot::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #10b981;
+}
+
+/* Footer Action Buttons */
+.card-footer-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  color: #334155;
+  text-decoration: none;
+  transition: all 0.15s ease;
+}
+
+.action-btn.btn-edit-primary {
+  flex: 1;
+  background: #0f172a;
+  border-color: #0f172a;
+  color: #ffffff;
+}
+
+.action-btn.btn-edit-primary:hover {
+  background: #1e293b;
+}
+
+.action-btn.btn-export-pdf:hover {
+  background: #eef2ff;
+  color: #4f46e5;
+  border-color: #c7d2fe;
+}
+
+.action-btn.btn-export-word:hover {
+  background: #ecfeff;
+  color: #0284c7;
+  border-color: #bae6fd;
+}
+
+.action-btn.btn-delete-danger {
+  padding: 0.5rem 0.6rem;
+  color: #94a3b8;
+}
+
+.action-btn.btn-delete-danger:hover {
+  background: #fef2f2;
+  border-color: #fca5a5;
+  color: #dc2626;
+}

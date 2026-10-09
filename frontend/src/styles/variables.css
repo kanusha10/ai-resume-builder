@@ -1,0 +1,83 @@
+:root {
+  /* ================================
+     BRAND
+  ================================= */
+
+  --color-primary: #5b5bd6;
+  --color-primary-hover: #4b4bc4;
+  --color-primary-soft: #eeeeff;
+
+  /* ================================
+     TEXT
+  ================================= */
+
+  --color-text-primary: #171927;
+  --color-text-secondary: #667085;
+  --color-text-muted: #98a2b3;
+  --color-text-white: #ffffff;
+
+  /* ================================
+     BACKGROUNDS
+  ================================= */
+
+  --color-background: #f8f9fc;
+  --color-surface: #ffffff;
+  --color-surface-soft: #f5f6fa;
+
+  /* ================================
+     BORDERS
+  ================================= */
+
+  --color-border: #e6e8ef;
+  --color-border-light: #eef0f4;
+
+  /* ================================
+     STATUS
+  ================================= */
+
+  --color-success: #16a34a;
+  --color-error: #dc2626;
+  --color-warning: #d97706;
+
+  /* ================================
+     TYPOGRAPHY
+  ================================= */
+
+  --font-heading: "Manrope", sans-serif;
+  --font-body: "Inter", sans-serif;
+
+  /* ================================
+     RADIUS
+  ================================= */
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --radius-xl: 24px;
+
+  /* ================================
+     SHADOWS
+  ================================= */
+
+  --shadow-sm:
+    0 1px 2px rgba(16, 24, 40, 0.04);
+
+  --shadow-md:
+    0 8px 30px rgba(16, 24, 40, 0.08);
+
+  --shadow-lg:
+    0 20px 60px rgba(16, 24, 40, 0.12);
+
+  /* ================================
+     LAYOUT
+  ================================= */
+
+  --container-width: 1180px;
+
+  /* ================================
+     TRANSITIONS
+  ================================= */
+
+  --transition-fast: 160ms ease;
+  --transition-normal: 240ms ease;
+}

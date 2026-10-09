@@ -1,0 +1,69 @@
+.how-it-works-section {
+  padding: 3rem 1.5rem;
+  background-color: #ffffff;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.steps-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+}
+
+.step-card {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 1.35rem;
+  position: relative;
+}
+
+.step-num-pill {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #94a3b8;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.step-icon-box {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: #0f172a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.85rem;
+}
+
+.step-title {
+  font-size: 0.98rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 0.35rem;
+}
+
+.step-desc {
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: #64748b;
+  margin: 0;
+}
+
+@media (max-width: 800px) {
+  .steps-container {
+    grid-template-columns: 1fr;
+  }
+}
