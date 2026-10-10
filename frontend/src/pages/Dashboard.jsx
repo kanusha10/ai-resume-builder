@@ -46,13 +46,19 @@ export default function Dashboard() {
   }, []);
 
   const handleDelete = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this resume?')) return;
+    console.log('Resume ID selected for deletion:', id);
+    console.log('Current resume IDs:', resumes.map((resume) => resume.id));
+
+    if (!window.confirm(`Are you sure you want to delete resume ID ${id}?`)) {
+      return;
+    }
+
     try {
       await deleteResume(id);
-      setResumes((prev) => prev.filter((r) => r.id !== id));
+      setResumes((prev) => prev.filter((resume) => resume.id !== id));
     } catch (err) {
       console.error('Failed to delete resume:', err);
-      alert('Failed to delete resume. Please try again.');
+      alert(`Failed to delete resume: ${err.message}`);
     }
   };
 

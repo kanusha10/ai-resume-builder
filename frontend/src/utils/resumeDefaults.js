@@ -19,12 +19,8 @@ export const emptyResume = {
 
   projects: [],
 
-  skills: {
-    frontend: [],
-    backend: [],
-    database: [],
-    tools: [],
-  },
+  // Start with no predefined skill categories.
+  skills: {},
 
   certifications: [],
 

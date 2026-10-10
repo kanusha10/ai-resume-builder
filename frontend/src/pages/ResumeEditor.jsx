@@ -175,7 +175,7 @@ function ResumeEditor() {
 
     try {
       const token = getToken();
-      const res = await fetch("http://localhost:8080/api/resumes/ai-enhance", {
+      const res = await fetch("/api/resumes/ai-enhance", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

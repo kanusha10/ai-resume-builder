@@ -103,7 +103,7 @@ export default function UploadResume() {
       const token = localStorage.getItem("token") || getToken();
 
       const response = await fetch(
-        "http://localhost:8080/api/resumes/upload",
+        "/api/resumes/upload",
         {
           method: "POST",
           headers: {

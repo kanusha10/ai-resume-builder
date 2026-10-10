@@ -1,3 +1,4 @@
+
 package com.anusha.resume_builder.auth.security;
 
 import io.jsonwebtoken.Claims;
@@ -9,7 +10,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
-import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -18,7 +18,7 @@ import java.util.function.Function;
 @Service
 public class JwtService {
 
-    @Value("${jwt.secret:404E635266556A586E3272357538782F413F4428472B4B6250645367566B59703273357638792F423F4528482B4D6251655468576D5A7134743777217A25432A}")
+    @Value("${jwt.secret}")
     private String secretKey;
 
     @Value("${jwt.expiration:86400000}")
@@ -28,7 +28,10 @@ public class JwtService {
         return extractClaim(token, Claims::getSubject);
     }
 
-    public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
+    public <T> T extractClaim(
+            String token,
+            Function<Claims, T> claimsResolver
+    ) {
         final Claims claims = extractAllClaims(token);
         return claimsResolver.apply(claims);
     }
@@ -37,22 +40,36 @@ public class JwtService {
         return generateToken(new HashMap<>(), subject);
     }
 
-    public String generateToken(Map<String, Object> extraClaims, String subject) {
+    public String generateToken(
+            Map<String, Object> extraClaims,
+            String subject
+    ) {
+        long now = System.currentTimeMillis();
+
         return Jwts.builder()
                 .claims(extraClaims)
                 .subject(subject)
-                .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + jwtExpiration))
-                .signWith(getSignInKey())
+                .issuedAt(new Date(now))
+                .expiration(new Date(now + jwtExpiration))
+                .signWith(getSignInKey(), Jwts.SIG.HS256)
                 .compact();
     }
 
     public String generateToken(UserDetails userDetails) {
-        return generateToken(new HashMap<>(), userDetails.getUsername());
+        return generateToken(
+                new HashMap<>(),
+                userDetails.getUsername()
+        );
     }
 
-    public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
-        return generateToken(extraClaims, userDetails.getUsername());
+    public String generateToken(
+            Map<String, Object> extraClaims,
+            UserDetails userDetails
+    ) {
+        return generateToken(
+                extraClaims,
+                userDetails.getUsername()
+        );
     }
 
     public boolean isTokenValid(String token) {
@@ -63,10 +80,18 @@ public class JwtService {
         }
     }
 
-    public boolean isTokenValid(String token, UserDetails userDetails) {
+    public boolean isTokenValid(
+            String token,
+            UserDetails userDetails
+    ) {
         try {
-            final String username = extractEmail(token);
-            return (username != null && username.equalsIgnoreCase(userDetails.getUsername())) && !isTokenExpired(token);
+            String username = extractEmail(token);
+
+            return username != null
+                    && username.equalsIgnoreCase(
+                    userDetails.getUsername()
+            )
+                    && !isTokenExpired(token);
         } catch (Exception e) {
             return false;
         }
@@ -89,12 +114,14 @@ public class JwtService {
     }
 
     private SecretKey getSignInKey() {
-        byte[] keyBytes;
-        try {
-            keyBytes = Decoders.BASE64.decode(secretKey);
-        } catch (Exception e) {
-            keyBytes = secretKey.getBytes(StandardCharsets.UTF_8);
+        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
+
+        if (keyBytes.length < 32) {
+            throw new IllegalArgumentException(
+                    "JWT secret must contain at least 32 decoded bytes for HS256"
+            );
         }
+
         return Keys.hmacShaKeyFor(keyBytes);
     }
 }
