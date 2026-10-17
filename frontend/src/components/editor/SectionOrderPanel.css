@@ -1,0 +1,42 @@
+.section-order-top { display: flex; gap: 10px; align-items: flex-start; justify-content: space-between; margin-bottom: 10px; }
+.section-order-top p { margin: 0; font-size: 0.78rem; color: #64748b; line-height: 1.45; }
+.section-order-reset {
+  flex: none; display: inline-flex; align-items: center; gap: 4px;
+  border: 1px solid #cbd5e1; background: #fff; color: #334155;
+  font-size: 0.72rem; font-weight: 700; padding: 5px 9px; border-radius: 8px; cursor: pointer;
+}
+.section-order-reset:hover { background: #f1f5f9; }
+
+.section-order-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.section-order-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 10px; background: #fff;
+  border: 1px solid #e2e8f0; border-radius: 10px;
+  transition: box-shadow 0.15s ease, border-color 0.15s ease, opacity 0.15s ease;
+}
+.section-order-item:hover { border-color: #c7d2fe; box-shadow: 0 2px 8px rgba(79, 70, 229, 0.08); }
+.section-order-item.dragging { opacity: 0.45; }
+.section-order-item.drop-target { border-color: #4f46e5; box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2); }
+.section-order-item.is-hidden { background: #f8fafc; }
+.section-order-item.is-hidden .section-order-label { color: #94a3b8; text-decoration: line-through; }
+
+.section-order-grip { color: #94a3b8; cursor: grab; display: inline-flex; }
+.section-order-item:active .section-order-grip { cursor: grabbing; }
+.section-order-index {
+  flex: none; width: 22px; height: 22px; border-radius: 50%;
+  background: #eef2ff; color: #3730a3; font-size: 0.72rem; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+}
+.section-order-label { flex: 1; min-width: 0; font-size: 0.85rem; font-weight: 600; color: #0f172a; }
+.section-order-label em {
+  margin-left: 8px; font-style: normal; font-size: 0.66rem; font-weight: 700;
+  color: #92400e; background: #fef3c7; padding: 1px 7px; border-radius: 999px;
+}
+.section-order-label em.hidden-tag { color: #475569; background: #e2e8f0; }
+.section-order-actions { display: inline-flex; gap: 2px; }
+.section-order-actions button {
+  border: none; background: transparent; color: #475569;
+  padding: 5px; border-radius: 6px; cursor: pointer; display: inline-flex;
+}
+.section-order-actions button:hover:not(:disabled) { background: #eef2ff; color: #3730a3; }
+.section-order-actions button:disabled { opacity: 0.3; cursor: not-allowed; }

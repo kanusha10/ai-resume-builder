@@ -1,4 +1,3 @@
-
 /**
  * Exports the live resume preview to PDF and Word (.doc).
  * PDF uses the browser's print engine to preserve template styling
@@ -6,257 +5,143 @@
  */
 
 // 1. Export resume preview to a multi-page A4 PDF.
-export async function exportPreviewToPdf(
-  elementId = "resume-paper",
-  filename = "resume"
-) {
-  const element = document.getElementById(elementId);
+export function exportPreviewToPdf(elementId = "resume-paper", fileName = "resume") {
+  const container = document.getElementById(elementId);
+  const sheets = container ? Array.from(container.querySelectorAll(".resume-sheet")) : [];
 
-  if (!element) {
-    console.error("Preview element not found with ID:", elementId);
-    return;
+  if (sheets.length === 0) {
+    console.error(`exportPreviewToPdf: no .resume-sheet pages found inside #${elementId}`);
+    return Promise.resolve();
   }
 
-  const styles = Array.from(
-    document.querySelectorAll('style, link[rel="stylesheet"]')
-  )
-    .map((style) => style.outerHTML)
-    .join("\n");
+  let documentCss = "";
+  const linkTags = [];
+  for (const sheet of Array.from(document.styleSheets)) {
+    try {
+      const rules = sheet.cssRules || sheet.rules;
+      if (rules) {
+        for (const rule of Array.from(rules)) documentCss += rule.cssText + "\n";
+      }
+    } catch (e) {
+      if (sheet.href) linkTags.push(`<link rel="stylesheet" href="${sheet.href}">`);
+    }
+  }
 
-  const printFrame = document.createElement("iframe");
+  // Overrides the app's global CSS (e.g. body{overflow:hidden; display:flex}) which
+  // otherwise makes the print frame render only the first page.
+  const printCss = `
+    @page { size: A4 portrait; margin: 0; }
 
-  printFrame.setAttribute("aria-hidden", "true");
-  printFrame.setAttribute("title", "Resume PDF export");
-
-  Object.assign(printFrame.style, {
-    position: "fixed",
-    right: "0",
-    bottom: "0",
-    width: "0",
-    height: "0",
-    border: "0",
-    visibility: "hidden",
-  });
-
-  document.body.appendChild(printFrame);
-
-  const frameWindow = printFrame.contentWindow;
-  const frameDoc = frameWindow.document;
-
-  const safeFilename =
-    String(filename)
-      .replace(/[<>:"/\\|?*\u0000-\u001F]/g, "")
-      .trim() || "resume";
-
-  const escapedElementId =
-    typeof CSS !== "undefined" && CSS.escape
-      ? CSS.escape(elementId)
-      : elementId.replace(/[^a-zA-Z0-9_-]/g, "");
-
-  frameDoc.open();
-
-  frameDoc.write(`
-    <!DOCTYPE html>
-    <html>
-      <head>
-        <meta charset="UTF-8" />
-        <meta
-          name="viewport"
-          content="width=device-width, initial-scale=1.0"
-        />
-        <base href="${document.baseURI}" />
-        <title>${safeFilename}</title>
-
-        ${styles}
-
-        <style>
-          @page {
-            size: A4 portrait;
-            margin: 12mm;
-          }
-
-          *,
-          *::before,
-          *::after {
-            box-sizing: border-box;
-            -webkit-print-color-adjust: exact !important;
-            print-color-adjust: exact !important;
-          }
-
-          html,
-          body {
-            margin: 0 !important;
-            padding: 0 !important;
-            width: 100% !important;
-            min-width: 0 !important;
-            height: auto !important;
-            background: #ffffff !important;
-          }
-
-          body {
-            font-family: Arial, Helvetica, sans-serif;
-            color: #111827;
-          }
-
-          /*
-           * Remove screen-only wrapper spacing.
-           */
-          .preview-wrapper {
-            display: block !important;
-            width: 100% !important;
-            max-width: none !important;
-            min-width: 0 !important;
-            height: auto !important;
-            margin: 0 !important;
-            padding: 0 !important;
-            overflow: visible !important;
-          }
-
-          /*
-           * Remove the screen preview's padding and shadow.
-           * The 12mm @page margin supplies the print margin.
-           */
-          #${escapedElementId} {
-            display: block !important;
-            width: 100% !important;
-            max-width: none !important;
-            min-width: 0 !important;
-            min-height: 0 !important;
-            height: auto !important;
-
-            margin: 0 !important;
-            padding: 0 !important;
-
-            background: #ffffff !important;
-            box-shadow: none !important;
-            border: none !important;
-            border-radius: 0 !important;
-
-            overflow: visible !important;
-            transform: none !important;
-            zoom: 1 !important;
-
-            break-inside: auto;
-            page-break-inside: auto;
-          }
-
-          /*
-           * Override template-specific screen padding.
-           */
-          #${escapedElementId}.template-minimal {
-            padding: 0 !important;
-          }
-
-          #${escapedElementId} * {
-            max-height: none;
-          }
-
-          /*
-           * Keep individual resume entries together when possible.
-           * Long entries may still flow naturally onto another page.
-           */
-          #${escapedElementId} .resume-entry,
-          #${escapedElementId} .resume-entry-top,
-          #${escapedElementId} .edu-entry,
-          #${escapedElementId} .ats-bullet-item {
-            break-inside: avoid;
-            page-break-inside: avoid;
-          }
-
-          #${escapedElementId} .section-title {
-            break-after: avoid;
-            page-break-after: avoid;
-          }
-
-          img,
-          svg {
-            max-width: 100%;
-          }
-
-          p,
-          li {
-            orphans: 2;
-            widows: 2;
-          }
-
-          a {
-            overflow-wrap: anywhere;
-          }
-
-          @media print {
-            html,
-            body {
-              margin: 0 !important;
-              padding: 0 !important;
-              width: 100% !important;
-              min-width: 0 !important;
-              height: auto !important;
-              overflow: visible !important;
-            }
-
-            #${escapedElementId} {
-              width: 100% !important;
-              max-width: none !important;
-              min-height: 0 !important;
-              height: auto !important;
-              margin: 0 !important;
-              padding: 0 !important;
-              overflow: visible !important;
-
-              -webkit-print-color-adjust: exact !important;
-              print-color-adjust: exact !important;
-            }
-          }
-        </style>
-      </head>
-
-      <body>
-        ${element.outerHTML}
-      </body>
-    </html>
-  `);
-
-  frameDoc.close();
-
-  try {
-    // Wait for fonts to finish loading.
-    if (frameDoc.fonts?.ready) {
-      await frameDoc.fonts.ready;
+    html, body {
+      display: block !important;
+      position: static !important;
+      width: auto !important;
+      height: auto !important;
+      min-width: 0 !important;
+      min-height: 0 !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      overflow: visible !important;
+      place-items: unset !important;
+      background: #ffffff !important;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
     }
 
-    // Wait for images to load.
-    const images = Array.from(frameDoc.images);
+    .resume-pages {
+      display: block !important;
+      gap: 0 !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      width: 210mm !important;
+      overflow: visible !important;
+    }
 
-    await Promise.all(
-      images.map((img) => {
-        if (img.complete) {
-          return Promise.resolve();
-        }
+    .resume-sheet {
+      display: block !important;
+      margin: 0 !important;
+      box-shadow: none !important;
+      width: 210mm !important;
+      height: 296.4mm !important;
+      overflow: hidden !important;
+      break-after: page;
+      page-break-after: always;
+      break-inside: avoid;
+    }
 
-        return new Promise((resolve) => {
-          img.onload = resolve;
-          img.onerror = resolve;
-        });
-      })
-    );
+    .resume-sheet:last-child {
+      break-after: auto !important;
+      page-break-after: auto !important;
+    }
 
-    // Allow layout and styles to settle before printing.
-    await new Promise((resolve) => setTimeout(resolve, 300));
+    .resume-paper h2.section-title {
+      font-weight: 700 !important;
+      font-synthesis: none;
+    }
+  `;
 
-    frameWindow.focus();
-    frameWindow.print();
-  } catch (error) {
-    console.error("Unable to prepare resume for printing:", error);
-  } finally {
-    // Give the print dialog time to open before removing the iframe.
-    setTimeout(() => {
-      if (printFrame.parentNode) {
-        printFrame.parentNode.removeChild(printFrame);
+  const pagesMarkup = sheets.map((s) => s.outerHTML).join("\n");
+
+  return new Promise((resolve) => {
+    const iframe = document.createElement("iframe");
+    iframe.setAttribute("aria-hidden", "true");
+    // Real A4 width so layout is computed at page size, not 0x0
+    iframe.style.cssText =
+      "position:fixed;left:-10000px;top:0;width:210mm;height:297mm;border:0;visibility:hidden;";
+    document.body.appendChild(iframe);
+
+    const originalTitle = document.title;
+    let finished = false;
+
+    const cleanup = () => {
+      if (finished) return;
+      finished = true;
+      document.title = originalTitle;
+      setTimeout(() => {
+        if (iframe.parentNode) iframe.parentNode.removeChild(iframe);
+      }, 500);
+      resolve();
+    };
+
+    const doc = iframe.contentDocument || iframe.contentWindow.document;
+    doc.open();
+    doc.write(`<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>${fileName}</title>
+    ${linkTags.join("\n")}
+    <style>${documentCss}</style>
+    <style>${printCss}</style>
+  </head>
+  <body><div class="resume-pages">${pagesMarkup}</div></body>
+</html>`);
+    doc.close();
+
+    const triggerPrint = async () => {
+      try {
+        if (iframe.contentDocument?.fonts?.ready) await iframe.contentDocument.fonts.ready;
+      } catch (e) {
+        // ignore
       }
-    }, 1500);
-  }
-}
+      setTimeout(() => {
+        const win = iframe.contentWindow;
+        if (!win) {
+          cleanup();
+          return;
+        }
+        document.title = fileName; // suggested PDF filename
+        win.addEventListener("afterprint", cleanup);
+        win.focus();
+        win.print();
+        setTimeout(cleanup, 60000);
+      }, 300);
+    };
 
+    if (iframe.contentDocument?.readyState === "complete") triggerPrint();
+    else iframe.onload = triggerPrint;
+  });
+}
 // 2. Export Word (.doc) formatted specifically for Microsoft Word's engine.
 // Kept unchanged.
 export function exportResumeToWord(resume, filename = "resume") {

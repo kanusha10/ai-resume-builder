@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { FileText, LogOut, User } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import './DashboardHeader.css';
+import ThemeToggle from "../common/ThemeToggle";
 
 export default function DashboardHeader() {
   const { user, logout } = useAuth();
@@ -41,6 +42,7 @@ export default function DashboardHeader() {
             <LogOut size={15} />
             <span>Sign Out</span>
           </button>
+          <ThemeToggle />
         </div>
       </div>
     </header>

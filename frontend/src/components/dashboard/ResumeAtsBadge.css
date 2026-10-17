@@ -1,0 +1,26 @@
+.dash-ats-wrap { display: inline-flex; }
+.dash-ats-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  border: 1px solid #e2e8f0; background: #fff; color: #0f172a;
+  padding: 4px 10px 4px 4px; border-radius: 999px;
+  font-size: 0.74rem; font-weight: 700; cursor: pointer;
+  transition: box-shadow 0.15s ease;
+}
+.dash-ats-badge:hover { box-shadow: 0 2px 8px rgba(15, 23, 42, 0.12); }
+.dash-ats-loading { padding: 6px 12px; color: #94a3b8; cursor: default; }
+.dash-ats-ring {
+  --c: #2563eb;
+  width: 30px; height: 30px; border-radius: 50%;
+  background: conic-gradient(var(--c) calc(var(--p) * 1%), #e2e8f0 0);
+  display: flex; align-items: center; justify-content: center;
+}
+.dash-ats-ring span {
+  width: 22px; height: 22px; border-radius: 50%; background: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.66rem; font-weight: 800;
+}
+.tone-excellent .dash-ats-ring { --c: #16a34a; }
+.tone-good .dash-ats-ring { --c: #2563eb; }
+.tone-fair .dash-ats-ring { --c: #d97706; }
+.tone-poor .dash-ats-ring { --c: #dc2626; }
+.dash-ats-text { white-space: nowrap; }

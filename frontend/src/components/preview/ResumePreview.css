@@ -1,405 +1,143 @@
-/* ==========================================================================
-   RESUME PREVIEW CANVAS
-   ========================================================================== */
-.preview-wrapper {
-  display: flex;
-  justify-content: center;
-  width: 100%;
+/* ================= PAGES / SCALING ================= */
+.preview-wrapper { position: relative; width: 100%; max-width: 100%; }
+.preview-scale-box { margin: 0 auto; position: relative; overflow: hidden; }
+.preview-scale-inner { transform-origin: top left; }
+
+.resume-measure { position: absolute; left: -99999px; top: 0; width: 182mm; visibility: hidden; pointer-events: none; }
+
+/* Visible split between pages = gap + shadow */
+.resume-pages { display: flex; flex-direction: column; gap: 22px; }
+
+.resume-sheet {
+  position: relative; flex: none; box-sizing: border-box;
+  width: 210mm; height: 297mm; padding: 10mm 14mm; overflow: hidden;
+  background: #fff; box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.08), 0 8px 26px rgba(15, 23, 42, 0.28);
 }
 
-/* Base A4 Paper */
+.resume-block { display: flow-root; }
+.resume-block.page-first h2.section-title { margin-top: 0 !important; }
+
+/* ================= PAPER BASE ================= */
+/* --resume-color is used ONLY by section headers (see h2.section-title rules) */
 .resume-paper {
-  width: 100%;
-  max-width: 800px;
-  min-height: 1050px;
-  background: #ffffff;
-  padding: 3rem 2.75rem;
-  color: #111827;
-  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.04);
-  box-sizing: border-box;
-  font-size: 9.5pt;
-  line-height: 1.45;
+  --resume-color: #0f172a;
+  --accent-soft: rgba(15, 23, 42, 0.07);
+  width: 100%; box-sizing: border-box; padding: 0; margin: 0; background: #fff; color: #111827;
+  font-family: Calibri, Carlito, "Segoe UI", Arial, Helvetica, sans-serif;
+  font-size: 10pt; line-height: 1.4; overflow-wrap: anywhere;
+  -webkit-print-color-adjust: exact; print-color-adjust: exact;
+}
+@supports (background: color-mix(in srgb, red 10%, white)) {
+  .resume-paper { --accent-soft: color-mix(in srgb, var(--resume-color) 10%, #ffffff); }
+}
+.resume-paper *, .resume-paper *::before, .resume-paper *::after { box-sizing: border-box; }
+
+/* ---------- Header (neutral colors) ---------- */
+.resume-header { padding-bottom: 8px; }
+.resume-header-inner { display: flex; align-items: center; gap: 16px; }
+.resume-header-text { flex: 1; min-width: 0; }
+.resume-photo { flex: none; width: 22mm; height: 22mm; object-fit: cover; border-radius: 50%; border: 1px solid #d1d5db; }
+.resume-name { margin: 0; font-weight: 800; line-height: 1.12; color: var(--resume-color); }
+.resume-role-sub { margin-top: 3px; font-weight: 600; color: #4b5563; }
+.resume-contact-bar { display: flex; flex-wrap: wrap; align-items: center; margin-top: 6px; font-size: 9pt; color: #374151; row-gap: 2px; }
+.contact-item { display: inline-flex; align-items: center; }
+.contact-item + .contact-item::before { content: "|"; margin: 0 8px; color: #9ca3af; font-weight: 400; }
+
+/* ---------- Links: neutral, underlined, clickable ---------- */
+.resume-link {
+  color: inherit; font-weight: 400; text-decoration: underline;
+  text-decoration-color: #9ca3af; text-underline-offset: 2px; text-decoration-thickness: 1px;
+}
+.resume-link:hover { text-decoration-color: currentColor; }
+
+/* ---------- Section heading: the ONLY colored element ---------- */
+.resume-paper h2.section-title {
+  font-size: 9.5pt !important; line-height: 1.25 !important; font-weight: 700 !important;
+  text-transform: uppercase; margin: 10px 0 5px; padding: 0 0 2px;
+  color: var(--resume-color); break-after: avoid; page-break-after: avoid;
 }
 
-/* Global Reset */
-.resume-paper h1,
-.resume-paper h2,
-.resume-paper h3,
-.resume-paper p,
-.resume-paper ul {
-  margin: 0;
-  padding: 0;
-}
+/* ---------- Content blocks (neutral) ---------- */
+.resume-summary-text { margin: 0 0 4px; font-size: 9.5pt; text-align: justify; }
+.skill-line { font-size: 9.5pt; margin-bottom: 2px; }
+.skill-cat-name { font-weight: 700; color: #111827; }
+.resume-entry { margin-bottom: 6px; }
+.entry-line { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.entry-title { font-weight: 700; font-size: 10pt; color: #111827; }
+.entry-title-wrap { min-width: 0; }
+.entry-tech { font-size: 9.5pt; color: #4b5563; }
+.entry-right { flex: none; font-size: 9pt; color: #4b5563; white-space: nowrap; }
+.entry-subline { font-size: 9.5pt; color: #374151; }
+.entry-grade { font-size: 9pt; color: #4b5563; }
+.entry-desc { margin: 2px 0 0; font-size: 9.5pt; }
+.ats-bullet-list { margin: 2px 0 0; padding: 0; list-style: none; }
+.ats-bullet-item { position: relative; padding-left: 14px; margin-bottom: 1.5px; font-size: 9.5pt; line-height: 1.38; }
+.ats-bullet-item::before { content: "•"; position: absolute; left: 4px; top: 0; color: #111827; }
+.languages-inline-row { font-size: 9.5pt; }
 
-/* NEUTRAL LINKS (Color removed) */
-.contact-link {
-  color: #374151;
-  text-decoration: none;
-}
-.contact-link:hover {
-  text-decoration: underline;
-}
+/* =====================================================================
+   1. DEFAULT "Modern": centered header, neutral rule, colored ruled headings
+   ===================================================================== */
+.template-default .resume-header { text-align: center; border-bottom: 1.5px solid #111827; margin-bottom: 2px; }
+.template-default .resume-header-inner { justify-content: center; }
+.template-default .resume-name { font-size: 24pt; letter-spacing: 0.01em; }
+.template-default .resume-role-sub { font-size: 11pt; }
+.template-default .resume-contact-bar { justify-content: center; }
+.template-default h2.section-title { border-bottom: 1.5px solid var(--resume-color); letter-spacing: 0.06em; }
 
-.ats-plain-link {
-  color: #1f2937;
-  text-decoration: underline;
-  text-underline-offset: 2px;
-}
+/* =====================================================================
+   2. TECHNICAL "Developer": left header, tinted heading bars, dense
+   ===================================================================== */
+.resume-paper.template-technical { font-family: Arial, Helvetica, sans-serif; font-size: 9.5pt; line-height: 1.36; }
+.template-technical .resume-header { border-bottom: 1px solid #d1d5db; margin-bottom: 2px; }
+.template-technical .resume-name { font-size: 22pt; }
+.template-technical .resume-role-sub { color: #111827; font-size: 10.5pt; }
+.template-technical h2.section-title { background: var(--accent-soft); border-left: 4px solid var(--resume-color); padding: 3px 0 3px 9px; letter-spacing: 0.08em; }
+.template-technical .resume-entry { margin-bottom: 5px; }
 
-.ats-plain-link.small {
-  font-size: 8.5pt;
-}
+/* =====================================================================
+   3. EXECUTIVE "Corporate": serif, neutral heavy rule, spaced headings
+   ===================================================================== */
+.resume-paper.template-executive { font-family: Georgia, "Times New Roman", serif; line-height: 1.46; }
+.template-executive .resume-header { border-bottom: 3px solid #111827; padding-bottom: 10px; margin-bottom: 4px; }
+.template-executive .resume-name { font-size: 25pt; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; }
+.template-executive .resume-role-sub { font-style: italic; font-weight: 400; font-size: 11pt; color: #374151; }
+.template-executive h2.section-title { letter-spacing: 0.16em; border-bottom: 1px solid var(--resume-color); margin: 13px 0 6px; }
+.template-executive .entry-subline, .template-executive .entry-right { font-style: italic; }
+.template-executive .resume-entry { margin-bottom: 8px; }
 
-.ats-link-suffix {
-  font-weight: normal;
-  color: #4b5563;
-}
+/* =====================================================================
+   4. HARVARD "Classic": Times, centered small-caps name, thin rules
+   ===================================================================== */
+.resume-paper.template-harvard { font-family: "Times New Roman", Times, serif; font-size: 10.5pt; line-height: 1.34; }
+.template-harvard .resume-header { text-align: center; }
+.template-harvard .resume-header-inner { justify-content: center; }
+.template-harvard .resume-name { font-size: 22pt; font-weight: 700; font-variant: small-caps; letter-spacing: 0.07em; }
+.template-harvard .resume-role-sub { color: #111827; font-weight: 400; font-style: italic; font-size: 10.5pt; }
+.template-harvard .resume-contact-bar { justify-content: center; font-size: 10pt; }
+.template-harvard h2.section-title { border-bottom: 1px solid var(--resume-color); letter-spacing: 0.05em; margin: 9px 0 4px; }
+.template-harvard .entry-right, .template-harvard .entry-subline { font-style: italic; font-size: 10pt; color: #111827; }
+.template-harvard .entry-title { font-size: 10.5pt; }
+.template-harvard .ats-bullet-item, .template-harvard .resume-summary-text, .template-harvard .skill-line { font-size: 10pt; }
 
-.resume-summary-text {
-  font-size: 9.5pt;
-  color: #1f2937;
-  line-height: 1.5;
-  text-align: justify;
+/* =====================================================================
+   5. MINIMAL "Clean Modern": neutral bar header, gray badges, skills grid
+   ===================================================================== */
+.resume-paper.template-minimal { font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 9.5pt; line-height: 1.5; color: #1f2937; }
+.template-minimal .resume-header { border-left: 5px solid #111827; padding: 2px 0 2px 14px; margin-bottom: 6px; }
+.template-minimal .resume-name { font-size: 26pt; font-weight: 700; letter-spacing: -0.01em; line-height: 1.05; }
+.template-minimal .resume-role-sub { color: #6b7280; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; font-size: 8.5pt; margin-top: 6px; }
+.template-minimal .resume-contact-bar { color: #6b7280; margin-top: 8px; }
+.template-minimal h2.section-title {
+  letter-spacing: 0.2em; margin: 16px 0 8px; padding-bottom: 5px;
+  background:
+    linear-gradient(var(--resume-color), var(--resume-color)) left bottom / 38px 2px no-repeat,
+    linear-gradient(#e5e7eb, #e5e7eb) left bottom / 100% 1px no-repeat;
 }
-
-.resume-entry {
-  margin-bottom: 0.65rem;
-}
-
-.resume-entry-top {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  font-size: 9.5pt;
-}
-
-.entry-dates {
-  font-size: 9pt;
-  color: #374151;
-  font-weight: 600;
-  white-space: nowrap;
-}
-
-.entry-sub-location,
-.entry-sub-school {
-  font-size: 9pt;
-  color: #4b5563;
-  margin: 0.05rem 0 0.15rem;
-}
-
-/* NEUTRAL GRADE (Color removed) */
-.ats-grade-text {
-  font-size: 8.8pt;
-  color: #1f2937;
-  font-weight: 600;
-}
-
-.entry-project-stack {
-  font-weight: normal;
-  color: #4b5563;
-}
-
-.entry-desc {
-  font-size: 9.5pt;
-  color: #1f2937;
-  line-height: 1.45;
-  margin: 0.2rem 0 0.35rem 0;
-  text-align: justify;
-}
-
-/* ==========================================================================
-   STANDARDIZED ATS BULLETS
-   ========================================================================== */
-.ats-bullet-list {
-  margin: 0.25rem 0 0.35rem 0 !important;
-  padding: 0 0 0 1.15rem !important;
-  list-style-type: disc !important;
-  list-style-position: outside !important;
-  box-sizing: border-box;
-}
-
-.ats-bullet-list li,
-.ats-bullet-item {
-  font-size: 9.3pt !important;
-  color: #1f2937 !important;
-  line-height: 1.45 !important;
-  margin-bottom: 0.2rem !important;
-  padding-left: 0.2rem !important;
-}
-
-.ats-bullet-list li:last-child {
-  margin-bottom: 0 !important;
-}
-
-/* 2-Column Skills Grid */
-.skills-two-column-grid {
-  display: grid !important;
-  grid-template-columns: 1fr 1fr !important;
-  column-gap: 2.2rem !important;
-  row-gap: 0.22rem !important;
-  margin: 0.25rem 0 0.35rem 0 !important;
-  padding: 0 0 0 1.15rem !important;
-  list-style-type: disc !important;
-  list-style-position: outside !important;
-  box-sizing: border-box;
-}
-
-.skills-two-column-grid li {
-  font-size: 9.3pt !important;
-  color: #1f2937 !important;
-  line-height: 1.4 !important;
-  padding-left: 0.2rem !important;
-}
-
-/* NEUTRAL CATEGORY ROWS (Color removed) */
-.skills-category-rows {
-  display: flex;
-  flex-direction: column;
-  gap: 0.22rem;
-  margin-top: 0.25rem;
-  font-size: 9.3pt;
-}
-
-.skill-cat-line {
-  line-height: 1.45;
-}
-
-.skill-cat-name {
-  color: #0f172a; /* Neutral dark */
-  font-weight: 700;
-}
-
-.skill-cat-items {
-  color: #1f2937;
-}
-
-.languages-inline-row {
-  font-size: 9.5pt;
-  color: #1f2937;
-}
-
-/* ==========================================================================
-   TEMPLATE 1: EMMA (ATS Modern - Clean Lines & Heading Accent)
-   ========================================================================== */
-.resume-paper.template-default,
-.resume-paper.template-emma {
-  font-family: Arial, Helvetica, sans-serif;
-}
-.resume-paper.template-default .resume-header,
-.resume-paper.template-emma .resume-header {
-  text-align: left;
-  margin-bottom: 1rem;
-}
-.resume-paper.template-default .resume-name,
-.resume-paper.template-emma .resume-name {
-  font-size: 18pt;
-  font-weight: 800;
-  letter-spacing: 0.04em;
-  color: var(--resume-color, #0f172a);
-  margin-bottom: 0.2rem;
-}
-.resume-paper.template-default .resume-role-sub,
-.resume-paper.template-emma .resume-role-sub {
-  font-size: 10pt;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: #374151;
-  margin-bottom: 0.35rem;
-}
-.resume-paper.template-default .resume-contact-bar,
-.resume-paper.template-emma .resume-contact-bar {
-  display: flex;
-  gap: 0.5rem;
-  font-size: 9pt;
-  color: #374151;
-}
-.resume-paper.template-default .section-title,
-.resume-paper.template-emma .section-title {
-  font-size: 9.5pt;
-  font-weight: 800;
-  text-transform: uppercase;
-  color: var(--resume-color, #0f172a);
-  border-bottom: 1.5px solid var(--resume-color, #0f172a);
-  padding-bottom: 0.15rem;
-  margin: 0.75rem 0 0.45rem;
-}
-
-/* ==========================================================================
-   TEMPLATE 2: AADITYA / TECH DATA ANALYST (Centered, Clean Dividers)
-   ========================================================================== */
-.resume-paper.template-technical,
-.resume-paper.template-aaditya {
-  font-family: Arial, Helvetica, sans-serif;
-}
-.resume-paper.template-technical .resume-header,
-.resume-paper.template-aaditya .resume-header {
-  text-align: center;
-  margin-bottom: 0.9rem;
-}
-.resume-paper.template-technical .resume-name,
-.resume-paper.template-aaditya .resume-name {
-  font-size: 16pt;
-  font-weight: 800;
-  color: var(--resume-color, #0f172a);
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  margin-bottom: 0.25rem;
-}
-.resume-paper.template-technical .resume-role-sub,
-.resume-paper.template-aaditya .resume-role-sub {
-  display: none;
-}
-.resume-paper.template-technical .resume-contact-bar,
-.resume-paper.template-aaditya .resume-contact-bar {
-  display: flex;
-  justify-content: center;
-  gap: 0.45rem;
-  font-size: 9pt;
-  color: #1f2937;
-}
-.resume-paper.template-technical .section-title,
-.resume-paper.template-aaditya .section-title {
-  font-size: 9.5pt;
-  font-weight: 800;
-  text-transform: uppercase;
-  color: var(--resume-color, #0f172a);
-  border-bottom: 1.2px solid var(--resume-color, #0f172a);
-  padding-bottom: 0.12rem;
-  margin: 0.7rem 0 0.4rem;
-}
-
-/* ==========================================================================
-   TEMPLATE 3: EXECUTIVE (Shaded Accent Banners)
-   ========================================================================== */
-.resume-paper.template-executive {
-  font-family: "Segoe UI", Arial, sans-serif;
-}
-.resume-paper.template-executive .resume-header {
-  text-align: left;
-  border-bottom: 2.5px solid var(--resume-color, #0f172a);
-  padding-bottom: 0.65rem;
-  margin-bottom: 0.9rem;
-}
-.resume-paper.template-executive .resume-name {
-  font-size: 19pt;
-  font-weight: 800;
-  color: var(--resume-color, #0f172a);
-  margin-bottom: 0.25rem;
-}
-.resume-paper.template-executive .resume-role-sub {
-  font-size: 10pt;
-  font-weight: 700;
-  color: #475569;
-  margin-bottom: 0.35rem;
-}
-.resume-paper.template-executive .resume-contact-bar {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.65rem;
-  font-size: 9pt;
-  color: #334155;
-}
-.resume-paper.template-executive .section-title {
-  background: color-mix(in srgb, var(--resume-color, #0f172a) 10%, #f8fafc);
-  border-bottom: 2px solid var(--resume-color, #0f172a);
-  padding: 0.22rem 0.55rem;
-  font-size: 9pt;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  color: var(--resume-color, #0f172a);
-  margin: 0.75rem 0 0.45rem;
-}
-
-/* ==========================================================================
-   TEMPLATE 4: HARVARD CLASSIC STANDARD (Times Serif)
-   ========================================================================== */
-.resume-paper.template-harvard,
-.resume-paper.template-classic {
-  font-family: "Times New Roman", Times, Georgia, serif;
-}
-.resume-paper.template-harvard .resume-header,
-.resume-paper.template-classic .resume-header {
-  text-align: center;
-  border-bottom: 1.5px solid var(--resume-color, #0f172a);
-  padding-bottom: 0.5rem;
-  margin-bottom: 0.85rem;
-}
-.resume-paper.template-harvard .resume-name,
-.resume-paper.template-classic .resume-name {
-  font-size: 17pt;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  color: var(--resume-color, #0f172a);
-  text-transform: uppercase;
-  margin-bottom: 0.25rem;
-}
-.resume-paper.template-harvard .resume-role-sub,
-.resume-paper.template-classic .resume-role-sub {
-  font-size: 9.5pt;
-  font-style: italic;
-  color: #374151;
-  margin-bottom: 0.25rem;
-}
-.resume-paper.template-harvard .resume-contact-bar,
-.resume-paper.template-classic .resume-contact-bar {
-  display: flex;
-  justify-content: center;
-  gap: 0.65rem;
-  font-size: 9.5pt;
-  color: #1f2937;
-}
-.resume-paper.template-harvard .section-title,
-.resume-paper.template-classic .section-title {
-  font-size: 9.5pt;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  color: var(--resume-color, #0f172a);
-  border-bottom: 1px solid var(--resume-color, #0f172a);
-  padding-bottom: 0.15rem;
-  margin: 0.75rem 0 0.4rem;
-}
-
-/* ==========================================================================
-   TEMPLATE 5: MINIMAL (Garamond Tracked Serif)
-   ========================================================================== */
-.resume-paper.template-minimal {
-  font-family: Georgia, Garamond, serif;
-  padding: 3.2rem 3rem;
-}
-.resume-paper.template-minimal .resume-header {
-  text-align: center;
-  border-top: 1px solid var(--resume-color, #cbd5e1);
-  border-bottom: 1px solid var(--resume-color, #cbd5e1);
-  padding: 0.75rem 0;
-  margin-bottom: 1rem;
-}
-.resume-paper.template-minimal .resume-name {
-  font-size: 15pt;
-  font-weight: 700;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  color: var(--resume-color, #0f172a);
-  margin-bottom: 0.25rem;
-}
-.resume-paper.template-minimal .resume-role-sub {
-  display: none;
-}
-.resume-paper.template-minimal .resume-contact-bar {
-  display: flex;
-  justify-content: center;
-  gap: 0.65rem;
-  font-size: 8.8pt;
-  color: #4b5563;
-  letter-spacing: 0.05em;
-}
-.resume-paper.template-minimal .section-title {
-  font-size: 9pt;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--resume-color, #0f172a);
-  border-bottom: 1px solid color-mix(in srgb, var(--resume-color, #0f172a) 25%, #e2e8f0);
-  padding-bottom: 0.15rem;
-  margin: 0.85rem 0 0.45rem;
-}
+.template-minimal .resume-entry { margin-bottom: 9px; }
+.template-minimal .entry-title { font-weight: 700; }
+.template-minimal .entry-right { background: #f3f4f6; color: #374151; font-weight: 600; font-size: 8.5pt; padding: 1px 9px; border-radius: 999px; }
+.template-minimal .entry-subline { color: #6b7280; font-weight: 500; }
+.template-minimal .skill-line { display: grid; grid-template-columns: 31mm minmax(0, 1fr); column-gap: 10px; margin-bottom: 4px; }
+.template-minimal .ats-bullet-item::before { content: "▪"; left: 3px; font-size: 8pt; top: 1px; }
+.template-minimal .resume-photo { border: 0; }

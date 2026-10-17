@@ -1,0 +1,30 @@
+/* Global dark mode: inverts the whole UI, then counter-inverts media and the resume pages */
+html { transition: filter 0.25s ease, background-color 0.25s ease; }
+
+html[data-theme="dark"] {
+  background: #ffffff;
+  filter: invert(0.93) hue-rotate(180deg);
+}
+
+html[data-theme="dark"] img,
+html[data-theme="dark"] video,
+html[data-theme="dark"] canvas,
+html[data-theme="dark"] iframe,
+html[data-theme="dark"] .resume-sheet,
+html[data-theme="dark"] .theme-keep {
+  filter: invert(1) hue-rotate(180deg);
+}
+
+/* images inside resume pages are already corrected by the sheet */
+html[data-theme="dark"] .resume-sheet img { filter: none; }
+
+/* ---------- toggle button ---------- */
+.theme-toggle {
+  display: inline-flex; align-items: center; gap: 7px; height: 36px; padding: 0 12px;
+  border: 1px solid #d3dae6; background: #ffffff; color: #1e293b;
+  border-radius: 999px; font-size: 0.78rem; font-weight: 700; cursor: pointer;
+  transition: background 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+}
+.theme-toggle:hover { background: #f1f5f9; box-shadow: 0 4px 12px rgba(15, 23, 42, 0.12); transform: translateY(-1px); }
+.theme-toggle.floating { position: fixed; top: 12px; right: 16px; z-index: 3000; box-shadow: 0 6px 18px rgba(15, 23, 42, 0.15); }
+@media (max-width: 640px) { .theme-toggle-label { display: none; } .theme-toggle { padding: 0 10px; } }

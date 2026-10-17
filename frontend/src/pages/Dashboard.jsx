@@ -4,6 +4,7 @@ import { Plus, Upload, FileText, DownloadCloud, Sparkles, X } from 'lucide-react
 import DashboardHeader from '../components/dashboard/DashboardHeader';
 import ResumeCard from '../components/dashboard/ResumeCard';
 import EmptyState from '../components/dashboard/EmptyState';
+import AtsScoreChecker from '../components/dashboard/AtsScoreChecker';
 import { useAuth } from '../context/AuthContext';
 import { getResumes, deleteResume, downloadResume } from '../api/resumeApi';
 import './Dashboard.css';
@@ -46,9 +47,6 @@ export default function Dashboard() {
   }, []);
 
   const handleDelete = async (id) => {
-    console.log('Resume ID selected for deletion:', id);
-    console.log('Current resume IDs:', resumes.map((resume) => resume.id));
-
     if (!window.confirm(`Are you sure you want to delete resume ID ${id}?`)) {
       return;
     }
@@ -182,16 +180,21 @@ export default function Dashboard() {
         ) : resumes.length === 0 ? (
           <EmptyState onOpenCreate={() => setShowCreateModal(true)} />
         ) : (
-          <div className="resumes-grid">
-            {resumes.map((resume) => (
-              <ResumeCard
-                key={resume.id}
-                resume={resume}
-                onDelete={handleDelete}
-                onDownload={handleDownload}
-              />
-            ))}
-          </div>
+          <>
+            <div className="resumes-grid">
+              {resumes.map((resume) => (
+                <ResumeCard
+                  key={resume.id}
+                  resume={resume}
+                  onDelete={handleDelete}
+                  onDownload={handleDownload}
+                />
+              ))}
+            </div>
+
+            {/* ATS Score Checker: pick a saved resume and analyze it */}
+            <AtsScoreChecker resumes={resumes} />
+          </>
         )}
       </main>
 
