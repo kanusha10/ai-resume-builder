@@ -1,5 +1,9 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { loginUser, registerUser } from "../utils/authApi";
+import {
+  loginUser,
+  requestRegistrationOtp,
+  verifyRegistrationOtp,
+} from "../utils/authApi";
 import { getToken, removeToken, setToken } from "../utils/auth";
 
 const AuthContext = createContext(null);
@@ -57,10 +61,42 @@ export function AuthProvider({ children }) {
     setLoading(true);
 
     try {
-      const response = await registerUser(userData);
+      return await requestRegistrationOtp(userData);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const verifyRegistration = async (data) => {
+    setLoading(true);
+
+    try {
+      const response = await verifyRegistrationOtp(data);
+
+      const receivedToken =
+        response.token || response.accessToken || response.jwt;
+
+      if (!receivedToken) {
+        throw new Error("OTP verified, but no token was returned.");
+      }
+
+      setToken(receivedToken);
+      setAuthToken(receivedToken);
+
+      const userData = {
+        id: response.id,
+        name: response.name || "",
+        email: response.email || data.email,
+      };
+
+      localStorage.setItem("user", JSON.stringify(userData));
+
       if (userData.name) {
         localStorage.setItem("userName", userData.name);
       }
+
+      setUser(userData);
+
       return response;
     } finally {
       setLoading(false);
@@ -93,6 +129,7 @@ export function AuthProvider({ children }) {
         isAuthenticated: Boolean(token),
         login,
         register,
+        verifyRegistration,
         logout,
       }}
     >

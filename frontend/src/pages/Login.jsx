@@ -1,20 +1,32 @@
+
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Mail, Lock, ArrowRight, AlertCircle } from 'lucide-react';
+import {
+  Mail,
+  Lock,
+  ArrowRight,
+  AlertCircle,
+} from 'lucide-react';
+
 import AuthLayout from '../components/auth/AuthLayout';
 import { useAuth } from '../context/AuthContext';
 
 export default function Login() {
-  const [formData, setFormData] = useState({ email: '', password: '' });
+  const [formData, setFormData] = useState({
+    email: '',
+    password: '',
+  });
+
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
+
   const { login } = useAuth();
   const navigate = useNavigate();
 
   const handleChange = (e) => {
     setFormData((prev) => ({
       ...prev,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     }));
   };
 
@@ -24,15 +36,15 @@ export default function Login() {
     setSubmitting(true);
 
     try {
-      // AuthContext's login handles loginUser(formData) and sets token in localStorage + state
       await login(formData);
       navigate('/dashboard', { replace: true });
     } catch (err) {
       console.error('Login error:', err);
+
       setError(
         err?.response?.data?.message ||
-        err?.message ||
-        'Invalid email or password. Please try again.'
+          err?.message ||
+          'Invalid email or password. Please try again.'
       );
     } finally {
       setSubmitting(false);
@@ -45,7 +57,7 @@ export default function Login() {
       subtitle="Access your saved resumes and drafts"
     >
       {error && (
-        <div className="auth-error-banner">
+        <div className="auth-error-banner" role="alert">
           <AlertCircle size={16} />
           <span>{error}</span>
         </div>
@@ -53,9 +65,13 @@ export default function Login() {
 
       <form onSubmit={handleSubmit} className="auth-form">
         <div className="form-group">
-          <label className="form-label" htmlFor="email">Email Address</label>
+          <label className="form-label" htmlFor="email">
+            Email Address
+          </label>
+
           <div className="input-wrapper">
             <Mail size={16} className="input-icon" />
+
             <input
               id="email"
               type="email"
@@ -64,15 +80,20 @@ export default function Login() {
               onChange={handleChange}
               placeholder="alex@domain.dev"
               className="form-input"
+              autoComplete="email"
               required
             />
           </div>
         </div>
 
         <div className="form-group">
-          <label className="form-label" htmlFor="password">Password</label>
+          <label className="form-label" htmlFor="password">
+            Password
+          </label>
+
           <div className="input-wrapper">
             <Lock size={16} className="input-icon" />
+
             <input
               id="password"
               type="password"
@@ -81,13 +102,36 @@ export default function Login() {
               onChange={handleChange}
               placeholder="••••••••"
               className="form-input"
+              autoComplete="current-password"
               required
             />
           </div>
+
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'flex-end',
+              marginTop: '8px',
+            }}
+          >
+            <Link
+              to="/forgot-password"
+              className="auth-link"
+              style={{ fontSize: '14px' }}
+            >
+              Forgot Password?
+            </Link>
+          </div>
         </div>
 
-        <button type="submit" className="auth-btn-primary" disabled={submitting}>
-          {submitting ? 'Signing in...' : (
+        <button
+          type="submit"
+          className="auth-btn-primary"
+          disabled={submitting}
+        >
+          {submitting ? (
+            'Signing in...'
+          ) : (
             <>
               Sign In <ArrowRight size={16} />
             </>
@@ -96,8 +140,10 @@ export default function Login() {
       </form>
 
       <div className="auth-footer-prompt">
-        Don't have an account?
-        <Link to="/register" className="auth-link">Create one</Link>
+        Don't have an account?{' '}
+        <Link to="/register" className="auth-link">
+          Create one
+        </Link>
       </div>
     </AuthLayout>
   );

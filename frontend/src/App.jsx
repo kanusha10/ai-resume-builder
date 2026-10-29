@@ -12,6 +12,7 @@ import Dashboard from "./pages/Dashboard";
 import ResumeEditor from "./pages/ResumeEditor";
 import UploadResume from "./pages/UploadResume";
 import NotFound from "./pages/NotFound";
+import ForgotPassword from './pages/ForgotPassword';
 
 import { AuthProvider, useAuth } from "./context/AuthContext";
 
@@ -35,10 +36,9 @@ function AppRoutes() {
   return (
     <Routes>
       <Route path="/" element={<Home />} />
-
       <Route path="/login" element={<Login />} />
-
       <Route path="/register" element={<Register />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
 
       <Route
         path="/dashboard"
