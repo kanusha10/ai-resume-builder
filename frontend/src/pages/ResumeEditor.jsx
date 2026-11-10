@@ -14,6 +14,9 @@ import ListSectionEditor from "../components/editor/ListSectionEditor";
 import StepNav from "../components/editor/StepNav";
 
 import ResumePreview from "../components/preview/ResumePreview";
+import AtsAnalyzerModal from "../components/ats/AtsAnalyzerModal";
+import { loadAnalysis, saveAnalysis } from "../utils/atsStorage";
+import { getLatestAnalysis } from "../api/atsApi";
 import { createResume, getResume, updateResume } from "../api/resumeApi";
 import { exportPreviewToPdf } from "../utils/previewExport";
 import { emptyResume } from "../utils/resumeDefaults";
@@ -43,6 +46,7 @@ import {
   ZoomOut,
   Maximize2,
   Eye,
+  Gauge,
 } from "lucide-react";
 
 import "./ResumeEditor.css";
@@ -141,6 +145,37 @@ function ResumeEditor() {
   const [enhancing, setEnhancing] = useState(false);
   const [pageCount, setPageCount] = useState(1);
   const [zoom, setZoom] = useState(1);
+  const [atsOpen, setAtsOpen] = useState(false);
+  const [atsRecord, setAtsRecord] = useState(() => loadAnalysis(id || "new"));
+
+  useEffect(() => {
+    if (!id) return undefined;
+
+    let cancelled = false;
+
+    getLatestAnalysis(id)
+      .then((remote) => {
+        if (cancelled || !remote) return;
+
+        const local = loadAnalysis(id);
+        if (!local || remote.analyzedAt > local.analyzedAt) {
+          saveAnalysis(id, remote);
+          setAtsRecord(remote);
+        }
+      })
+      .catch(() => {});
+
+    return () => {
+      cancelled = true;
+    };
+  }, [id]);
+
+  const handleAtsRecord = (record) => {
+    setAtsRecord(record);
+    saveAnalysis(id || "new", record);
+  };
+
+  const atsScore = atsRecord?.result?.score ?? null;
   const zoomIn = () => setZoom((z) => ZOOM_STEPS.find((s) => s > z + 0.001) || z);
   const zoomOut = () => setZoom((z) => [...ZOOM_STEPS].reverse().find((s) => s < z - 0.001) || z);
 
@@ -358,6 +393,20 @@ function ResumeEditor() {
     setError("");
     setCurrentStep(index);
   };
+  const openStepFromAts = (stepId) => {
+    const index = STEPS.findIndex((step) => step.id === stepId);
+
+    if (index >= 0) {
+      setCurrentStep(index);
+    }
+
+    setError("");
+    setPersonalValidated(false);
+
+    if (viewMode === "preview") {
+      setViewMode("both");
+    }
+  };
 
   const goNext = () => {
     if (currentStep === 0) {
@@ -407,6 +456,24 @@ function ResumeEditor() {
     progressPct,
     completedCount,
   };
+
+  const atsButton = (
+    <button
+      type="button"
+      className="atsx-trigger"
+      onClick={() => setAtsOpen(true)}
+      title="See how an applicant tracking system will read this resume"
+      aria-haspopup="dialog"
+    >
+      <Gauge size={15} />
+      <span>ATS Score</span>
+      {atsScore !== null && (
+        <span className={`atsx-trigger-score tone-${atsScore >= 85 ? "excellent" : atsScore >= 70 ? "good" : atsScore >= 55 ? "fair" : "poor"}`}>
+          {atsScore}
+        </span>
+      )}
+    </button>
+  );
 
   return (
     <div className="editor-page">
@@ -681,6 +748,7 @@ function ResumeEditor() {
                     <span>Skip</span>
                   </button>
                 )}
+                {viewMode === "editor" && atsButton}
               </div>
 
               <div className="form-footer-right">
@@ -714,6 +782,8 @@ function ResumeEditor() {
                 </span>
               </div>
 
+             <div className="preview-toolbar-actions">
+                 {atsButton}
               {viewMode === "preview" && (
                 <div className="zoom-controls">
                   <button type="button" onClick={zoomOut} disabled={zoom <= ZOOM_STEPS[0]} title="Zoom out">
@@ -734,6 +804,7 @@ function ResumeEditor() {
                   </button>
                 </div>
               )}
+             </div>
             </div>
 
             <div className="preview-scroll">
@@ -749,6 +820,15 @@ function ResumeEditor() {
           </section>
         )}
       </div>
+      <AtsAnalyzerModal
+        open={atsOpen}
+        onClose={() => setAtsOpen(false)}
+        resume={resume}
+        resumeId={id}
+        record={atsRecord}
+        onRecordChange={handleAtsRecord}
+        onGoToStep={openStepFromAts}
+      />
     </div>
   );
 }

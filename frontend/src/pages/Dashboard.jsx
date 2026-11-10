@@ -4,7 +4,6 @@ import { Plus, Upload, FileText, DownloadCloud, Sparkles, X } from 'lucide-react
 import DashboardHeader from '../components/dashboard/DashboardHeader';
 import ResumeCard from '../components/dashboard/ResumeCard';
 import EmptyState from '../components/dashboard/EmptyState';
-import AtsScoreChecker from '../components/dashboard/AtsScoreChecker';
 import { useAuth } from '../context/AuthContext';
 import { getResumes, deleteResume, downloadResume } from '../api/resumeApi';
 import './Dashboard.css';
@@ -191,9 +190,6 @@ export default function Dashboard() {
                 />
               ))}
             </div>
-
-            {/* ATS Score Checker: pick a saved resume and analyze it */}
-            <AtsScoreChecker resumes={resumes} />
           </>
         )}
       </main>
