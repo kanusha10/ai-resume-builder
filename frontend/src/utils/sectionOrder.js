@@ -24,13 +24,11 @@ export const SECTION_LABELS = {
   languages: "Languages",
 };
 
-// Always returns every known section exactly once, honoring the saved order.
-export function normalizeSectionOrder(order) {
-  const saved = Array.isArray(order)
-    ? order.filter((id) => DEFAULT_SECTION_ORDER.includes(id))
-    : [];
+export function normalizeSectionOrder(order, customIds = []) {
+  const valid = [...DEFAULT_SECTION_ORDER, ...customIds];
+  const saved = Array.isArray(order) ? order.filter((id) => valid.includes(id)) : [];
   const unique = [...new Set(saved)];
-  DEFAULT_SECTION_ORDER.forEach((id) => {
+  valid.forEach((id) => {
     if (!unique.includes(id)) unique.push(id);
   });
   return unique;

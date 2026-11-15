@@ -1,4 +1,4 @@
-
+import PasswordInput from "../components/auth/PasswordInput";
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
@@ -275,46 +275,14 @@ export default function ForgotPassword() {
             <label className="form-label" htmlFor="newPassword">
               New Password
             </label>
-
-            <div className="input-wrapper">
-              <Lock size={16} className="input-icon" />
-              <input
-                id="newPassword"
-                type="password"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                placeholder="At least 6 characters"
-                className="form-input"
-                autoComplete="new-password"
-                minLength={6}
-                maxLength={100}
-                required
-              />
-            </div>
+            <PasswordInput name="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} placeholder="..." required />
           </div>
 
           <div className="form-group">
             <label className="form-label" htmlFor="confirmPassword">
               Confirm New Password
             </label>
-
-            <div className="input-wrapper">
-              <Lock size={16} className="input-icon" />
-              <input
-                id="confirmPassword"
-                type="password"
-                value={confirmPassword}
-                onChange={(e) =>
-                  setConfirmPassword(e.target.value)
-                }
-                placeholder="Enter password again"
-                className="form-input"
-                autoComplete="new-password"
-                minLength={6}
-                maxLength={100}
-                required
-              />
-            </div>
+            <PasswordInput name="password" value={confirmPassword} onChange={(e) =>setConfirmPassword(e.target.value)} placeholder="..." required />
           </div>
 
           <button

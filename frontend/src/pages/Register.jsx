@@ -1,4 +1,4 @@
-
+import PasswordInput from "../components/auth/PasswordInput";
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
@@ -164,22 +164,7 @@ export default function Register() {
             <label className="form-label" htmlFor="password">
               Password
             </label>
-            <div className="input-wrapper">
-              <Lock size={16} className="input-icon" />
-              <input
-                id="password"
-                type="password"
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                placeholder="At least 6 characters"
-                className="form-input"
-                minLength={6}
-                maxLength={100}
-                autoComplete="new-password"
-                required
-              />
-            </div>
+            <PasswordInput name="password" value={formData.password} onChange={handleChange} placeholder="••••••••" required />
           </div>
 
           <button

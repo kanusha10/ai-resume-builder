@@ -58,7 +58,6 @@ export function exportPreviewToPdf(elementId = "resume-paper", fileName = "resum
     }
 
     .resume-sheet {
-      display: block !important;
       margin: 0 !important;
       box-shadow: none !important;
       width: 210mm !important;
@@ -68,7 +67,9 @@ export function exportPreviewToPdf(elementId = "resume-paper", fileName = "resum
       page-break-after: always;
       break-inside: avoid;
     }
-
+    .resume-sheet.sheet-2col {
+      display: grid !important;
+    }
     .resume-sheet:last-child {
       break-after: auto !important;
       page-break-after: auto !important;

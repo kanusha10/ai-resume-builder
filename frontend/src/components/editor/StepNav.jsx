@@ -1,5 +1,5 @@
-import React from "react";
-import { Check } from "lucide-react";
+import React, { useEffect, useRef } from "react";
+import { Check, Plus } from "lucide-react";
 
 export default function StepNav({
   steps,
@@ -9,7 +9,15 @@ export default function StepNav({
   progressPct,
   completedCount,
   variant = "top", // "top" (editor + preview) | "rail" (form only)
+  onAdd,
 }) {
+  const countable = steps.filter((s) => !s.meta).length;
+  const navRef = useRef(null);
+
+  useEffect(() => {
+    navRef.current?.querySelector(".nav-step.active")?.scrollIntoView({ block: "nearest", inline: "nearest" });
+  }, [currentStep, steps.length]);
+
   const tabs = steps.map((s, index) => {
     const Icon = s.icon;
     const active = currentStep === index;
@@ -29,17 +37,29 @@ export default function StepNav({
     );
   });
 
+  const addButton = onAdd ? (
+    <button type="button" className="nav-step nav-step-add" onClick={onAdd} title="Add your own section">
+      <span className="nav-badge">
+        <Plus size={11} strokeWidth={3} />
+      </span>
+      <span className="nav-label">Add</span>
+    </button>
+  ) : null;
+
   if (variant === "top") {
     return (
       <div className="steps-top">
-        <nav className="steps-top-grid">{tabs}</nav>
+        <nav className="steps-top-grid" ref={navRef}>
+          {tabs}
+          {addButton}
+        </nav>
         <div className="nav-progress">
           <div className="nav-progress-track">
             <div className="nav-progress-fill" style={{ width: `${progressPct}%` }} />
           </div>
           <div className="nav-progress-meta">
             <span>
-              {completedCount} of {steps.length - 1} sections filled
+              {completedCount} of {countable} sections filled
             </span>
             <b>{progressPct}%</b>
           </div>
@@ -59,12 +79,15 @@ export default function StepNav({
           <div className="rail-progress-fill" style={{ width: `${progressPct}%` }} />
         </div>
         <small>
-          {completedCount} of {steps.length - 1} sections filled
+          {completedCount} of {countable} sections filled
         </small>
       </div>
 
       <div className="rail-title">Sections</div>
-      <nav className="steps-rail-list">{tabs}</nav>
+      <nav className="steps-rail-list" ref={navRef}>
+        {tabs}
+        {addButton}
+      </nav>
     </aside>
   );
 }

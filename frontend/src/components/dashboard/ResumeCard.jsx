@@ -4,6 +4,7 @@ import { Edit3, FileDown, FileText, Trash2, Calendar, Briefcase, FileCode2 } fro
 import { downloadResumeDocx } from '../../utils/docxExport';
 import './ResumeCard.css';
 import { exportResumeToWord } from "../../utils/previewExport";
+import { getTemplate } from '../../utils/resumeTemplates';
 
 export default function ResumeCard({ resume, onDelete, onDownload }) {
   const title = resume.name || resume.title || 'Untitled Resume';
@@ -47,7 +48,7 @@ export default function ResumeCard({ resume, onDelete, onDownload }) {
             <span>{role}</span>
           </div>
         </div>
-        <span className="card-pill-template">{templateName}</span>
+        <span className="card-pill-template">{getTemplate(resume.template).name}</span>
       </div>
 
       {/* Middle Meta Info */}

@@ -12,7 +12,9 @@
 
 /* ================= STEPS: ONE LINE (top) ================= */
 .steps-top { flex: none; padding: 10px 20px 12px; background: #fff; border-bottom: 1px solid #dde3ec; }
-.steps-top-grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 6px; }
+.steps-top-grid { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(92px, 1fr); gap: 6px; overflow-x: auto; scrollbar-width: none; }
+.steps-top-grid::-webkit-scrollbar { display: none; }
+.nav-step-add { border-style: dashed; color: #4338ca; background: #f5f7ff; }
 
 .nav-step {
   display: flex; align-items: center; justify-content: center; gap: 6px; min-width: 0;

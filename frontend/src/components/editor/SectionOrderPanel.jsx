@@ -11,12 +11,18 @@ export default function SectionOrderPanel({
   order,
   hidden = [],
   hasContent = () => true,
+  customSections = [],
   onChange,
   onHiddenChange,
 }) {
   const [dragIndex, setDragIndex] = useState(null);
   const [overIndex, setOverIndex] = useState(null);
-  const list = normalizeSectionOrder(order);
+  const customIds = customSections.map((c) => c.id);
+  const labels = {
+    ...SECTION_LABELS,
+    ...Object.fromEntries(customSections.map((c) => [c.id, (c.title || "").trim() || "Custom Section"])),
+  };
+  const list = normalizeSectionOrder(order, customIds);
 
   const move = (from, to) => {
     if (to < 0 || to >= list.length || from === to) return;
@@ -31,7 +37,7 @@ export default function SectionOrderPanel({
   };
 
   const reset = () => {
-    onChange([...DEFAULT_SECTION_ORDER]);
+    onChange([...DEFAULT_SECTION_ORDER, ...customIds]);
     onHiddenChange([]);
   };
 
@@ -87,7 +93,7 @@ export default function SectionOrderPanel({
               </span>
               <span className="section-order-index">{index + 1}</span>
               <span className="section-order-label">
-                {SECTION_LABELS[id]}
+                {labels[id] || id}
                 {!filled && <em>empty</em>}
                 {isHidden && <em className="hidden-tag">hidden</em>}
               </span>

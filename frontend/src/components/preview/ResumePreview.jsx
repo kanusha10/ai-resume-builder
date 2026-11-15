@@ -1,28 +1,15 @@
-import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { formatUrl } from "../../utils/urlFormatter";
 import { normalizeSectionOrder } from "../../utils/sectionOrder";
+import { resolveDesign } from "../../utils/resumeTemplates";
+import { ensureFont } from "../../utils/fontLoader";
 import "./ResumePreview.css";
 
-const MM = 3.7795; // px per mm @ 96dpi
+const MM = 3.7795;
 const A4_WIDTH_PX = 794;
-const SHEET_HEIGHT_PX = 297 * MM; // 1122.5px
-const CONTENT_HEIGHT_PX = 277 * MM; // A4 minus 10mm top and bottom padding
+const SHEET_HEIGHT_PX = 297 * MM;
+const CONTENT_HEIGHT_PX = 277 * MM;
 const PAGE_GAP_PX = 22;
-
-const TEMPLATE_ALIASES = {
-  default: "default",
-  emma: "default",
-  technical: "technical",
-  aaditya: "technical",
-  executive: "executive",
-  harvard: "harvard",
-  classic: "harvard",
-  minimal: "minimal",
-};
-
-function normalizeTemplate(value) {
-  return TEMPLATE_ALIASES[String(value || "default").toLowerCase()] || "default";
-}
 
 const formatDates = (item) => [item.startDate, item.endDate].filter(Boolean).join(" - ");
 
@@ -88,7 +75,6 @@ function normalizeSkillCategories(skills) {
     .filter((item) => item.category && item.skills.length > 0);
 }
 
-// Greedy packing of measured blocks into A4 pages
 function paginate(heights) {
   const limit = CONTENT_HEIGHT_PX - 2;
   const pages = [[]];
@@ -112,7 +98,7 @@ function Link({ href, children }) {
   );
 }
 
-export default function ResumePreview({ resume, maxScale = 1, zoom = 1, onPagesChange }) {
+export default function ResumePreview({ resume, maxScale = 1, zoom = 1, onPagesChange, exportable = true })  {
   const {
     personal = {},
     summary = "",
@@ -127,19 +113,23 @@ export default function ResumePreview({ resume, maxScale = 1, zoom = 1, onPagesC
     involvement = [],
   } = resume || {};
 
-  const currentColor = resume?.color || resume?.primaryColor || "#0f172a";
-  const template = normalizeTemplate(resume?.template);
+  const { tpl, font, style, className } = resolveDesign(resume);
+  const isSidebar = tpl.layout === "sidebar";
+  const sidebarIds = isSidebar ? tpl.sidebar.sections : [];
+
   const skillCategories = normalizeSkillCategories(skills);
+  const customSections = Array.isArray(resume?.customSections) ? resume.customSections : [];
   const hidden = Array.isArray(resume?.hiddenSections) ? resume.hiddenSections : [];
-  const order = normalizeSectionOrder(resume?.sectionOrder).filter((id) => !hidden.includes(id));
+  const order = normalizeSectionOrder(
+    resume?.sectionOrder,
+    customSections.map((c) => c.id)
+  ).filter((id) => !hidden.includes(id));
 
   const wrapperRef = useRef(null);
   const measureRef = useRef(null);
   const [fit, setFit] = useState(1);
   const scale = Math.max(0.25, Math.min(4, Math.min(fit, maxScale) * zoom));
   const [pages, setPages] = useState(null);
-
-  /* ---------------- BLOCK BUILDING ---------------- */
 
   const entryHead = ({ title, right, sub }) => (
     <div className="entry-head">
@@ -151,6 +141,26 @@ export default function ResumePreview({ resume, maxScale = 1, zoom = 1, onPagesC
     </div>
   );
 
+  const contactItems = () => {
+    const items = [];
+    if (personal.location) items.push({ key: "loc", node: <span>{personal.location}</span> });
+    if (personal.phone) items.push({ key: "tel", node: <span>{personal.phone}</span> });
+    if (personal.email) {
+      items.push({
+        key: "mail",
+        node: (
+          <a href={`mailto:${personal.email}`} className="resume-link">
+            {personal.email}
+          </a>
+        ),
+      });
+    }
+    if (personal.linkedin) items.push({ key: "in", node: <Link href={personal.linkedin}>LinkedIn</Link> });
+    if (personal.github) items.push({ key: "gh", node: <Link href={personal.github}>GitHub</Link> });
+    if (personal.website) items.push({ key: "web", node: <Link href={personal.website}>Portfolio</Link> });
+    return items;
+  };
+
   const header = (
     <header className="resume-header">
       <div className="resume-header-inner">
@@ -158,45 +168,59 @@ export default function ResumePreview({ resume, maxScale = 1, zoom = 1, onPagesC
           <h1 className="resume-name">{personal.fullName || "Your Name"}</h1>
           {resume?.role && <div className="resume-role-sub">{resume.role}</div>}
 
-          <div className="resume-contact-bar">
-            {personal.location && <span className="contact-item">{personal.location}</span>}
-            {personal.phone && <span className="contact-item">{personal.phone}</span>}
-            {personal.email && (
-              <span className="contact-item">
-                <a href={`mailto:${personal.email}`} className="resume-link">{personal.email}</a>
-              </span>
-            )}
-            {personal.linkedin && (
-              <span className="contact-item"><Link href={personal.linkedin}>LinkedIn</Link></span>
-            )}
-            {personal.github && (
-              <span className="contact-item"><Link href={personal.github}>GitHub</Link></span>
-            )}
-            {personal.website && (
-              <span className="contact-item"><Link href={personal.website}>Portfolio</Link></span>
-            )}
-          </div>
+          {!isSidebar && (
+            <div className="resume-contact-bar">
+              {contactItems().map((c) => (
+                <span key={c.key} className="contact-item">
+                  {c.node}
+                </span>
+              ))}
+            </div>
+          )}
         </div>
 
-        {personal.photo && <img className="resume-photo" src={personal.photo} alt="Profile" />}
+        {!isSidebar && personal.photo && <img className="resume-photo" src={personal.photo} alt="Profile" />}
       </div>
     </header>
+  );
+
+  const sideContact = (
+    <div className="sb-contact">
+      {personal.photo && <img className="resume-photo sb-photo" src={personal.photo} alt="Profile" />}
+      <h2 className="section-title">
+        <span>Contact</span>
+      </h2>
+      <div className="sb-contact-list">
+        {contactItems().map((c) => (
+          <div key={c.key} className="sb-contact-item">
+            {c.node}
+          </div>
+        ))}
+      </div>
+    </div>
   );
 
   const sections = {
     summary: () =>
       summary
-        ? { title: "SUMMARY", items: [<p key="s" className="resume-summary-text">{summary}</p>] }
+        ? { title: "Summary", items: [<p key="s" className="resume-summary-text">{summary}</p>] }
         : null,
 
     skills: () =>
       skillCategories.length
         ? {
-            title: "TECHNICAL SKILLS",
+            title: "Technical Skills",
             items: skillCategories.map(({ category, skills: list }) => (
               <div key={category} className="skill-line">
                 <strong className="skill-cat-name">{category}:</strong>{" "}
-                <span className="skill-cat-items">{list.join(", ")}</span>
+                <span className="skill-cat-items">
+                  {list.map((skill, i) => (
+                    <span key={`${skill}-${i}`} className="skill-chip">
+                      {skill}
+                      {i < list.length - 1 && <span className="skill-sep">, </span>}
+                    </span>
+                  ))}
+                </span>
               </div>
             )),
           }
@@ -205,7 +229,7 @@ export default function ResumePreview({ resume, maxScale = 1, zoom = 1, onPagesC
     experience: () =>
       experience.length
         ? {
-            title: "WORK EXPERIENCE",
+            title: "Work Experience",
             items: experience.map((item, i) => (
               <div className="resume-entry" key={i}>
                 {entryHead({
@@ -222,7 +246,7 @@ export default function ResumePreview({ resume, maxScale = 1, zoom = 1, onPagesC
     internships: () =>
       internships.length
         ? {
-            title: "INTERNSHIPS",
+            title: "Internships",
             items: internships.map((item, i) => (
               <div className="resume-entry" key={i}>
                 {entryHead({
@@ -239,7 +263,7 @@ export default function ResumePreview({ resume, maxScale = 1, zoom = 1, onPagesC
     projects: () =>
       projects.length
         ? {
-            title: "PROJECTS",
+            title: "Projects",
             items: projects.map((item, i) => (
               <div className="resume-entry" key={i}>
                 <div className="entry-head">
@@ -264,7 +288,7 @@ export default function ResumePreview({ resume, maxScale = 1, zoom = 1, onPagesC
     education: () =>
       education.length
         ? {
-            title: "EDUCATION",
+            title: "Education",
             items: education.map((item, i) => {
               const degreeText = cleanEducationDegree(item);
               const hasField =
@@ -288,7 +312,7 @@ export default function ResumePreview({ resume, maxScale = 1, zoom = 1, onPagesC
     certifications: () =>
       certifications.length
         ? {
-            title: "CERTIFICATIONS",
+            title: "Certifications",
             items: certifications.map((item, i) => (
               <ul className="ats-bullet-list" key={i}>
                 <li className="ats-bullet-item">
@@ -311,7 +335,7 @@ export default function ResumePreview({ resume, maxScale = 1, zoom = 1, onPagesC
     achievements: () =>
       achievements.length
         ? {
-            title: "ACHIEVEMENTS",
+            title: "Achievements",
             items: achievements.map((item, i) => (
               <ul className="ats-bullet-list" key={i}>
                 <li className="ats-bullet-item">
@@ -327,7 +351,7 @@ export default function ResumePreview({ resume, maxScale = 1, zoom = 1, onPagesC
     involvement: () =>
       involvement.length
         ? {
-            title: "INVOLVEMENT & ACTIVITIES",
+            title: "Involvement & Activities",
             items: involvement.map((item, i) => (
               <div className="resume-entry" key={i}>
                 {entryHead({
@@ -344,13 +368,13 @@ export default function ResumePreview({ resume, maxScale = 1, zoom = 1, onPagesC
     languages: () =>
       languages.length
         ? {
-            title: "LANGUAGES",
+            title: "Languages",
             items: [
               <div key="l" className="languages-inline-row">
                 {languages.map((language, index) => (
                   <span key={index} className="lang-item">
                     <strong>{language.name}</strong> ({language.proficiency || "Fluent"})
-                    {index < languages.length - 1 && " • "}
+                    {index < languages.length - 1 && <span className="lang-sep"> • </span>}
                   </span>
                 ))}
               </div>,
@@ -359,40 +383,102 @@ export default function ResumePreview({ resume, maxScale = 1, zoom = 1, onPagesC
         : null,
   };
 
-  // Every block is atomic (never split across pages). A section's heading is
-  // attached to its first block so a heading can never be stranded at a page end.
-  const blocks = [{ key: "header", node: header }];
-  order.forEach((id) => {
-    const section = sections[id] ? sections[id]() : null;
-    if (!section) return;
-    section.items.forEach((item, i) => {
-      blocks.push({
-        key: `${id}-${i}`,
-        node: (
-          <>
-            {i === 0 && (
-              <h2 className="section-title">
-                <span>{section.title}</span>
-              </h2>
-            )}
-            {item}
-          </>
-        ),
-      });
-    });
+  customSections.forEach((cs) => {
+    sections[cs.id] = () => {
+      const title = (cs.title || "").trim() || "Custom Section";
+
+      if (cs.type === "text") {
+        return cs.text && cs.text.trim()
+          ? { title, items: [<p key="t" className="resume-summary-text pre-line">{cs.text.trim()}</p>] }
+          : null;
+      }
+
+      if (cs.type === "bullets") {
+        const rows = (cs.items || []).map((i) => String(i.text || "").trim()).filter(Boolean);
+        return rows.length
+          ? {
+              title,
+              items: [
+                <ul key="b" className="ats-bullet-list">
+                  {rows.map((row, i) => (
+                    <li key={i} className="ats-bullet-item">
+                      <span>{row}</span>
+                    </li>
+                  ))}
+                </ul>,
+              ],
+            }
+          : null;
+      }
+
+      const rows = (cs.items || []).filter((i) => i.title || i.subtitle || i.description || i.date);
+      return rows.length
+        ? {
+            title,
+            items: rows.map((item, i) => (
+              <div className="resume-entry" key={i}>
+                {entryHead({ title: item.title || "Untitled", right: item.date, sub: item.subtitle })}
+                {renderBulletList(item.description)}
+              </div>
+            )),
+          }
+        : null;
+    };
   });
 
-  /* ---------------- MEASURE + PAGINATE ---------------- */
+  const toBlocks = (ids, lead) => {
+    const out = lead ? [...lead] : [];
+    ids.forEach((id) => {
+      const section = sections[id] ? sections[id]() : null;
+      if (!section) return;
+      section.items.forEach((item, i) => {
+        out.push({
+          key: `${id}-${i}`,
+          node: (
+            <>
+              {i === 0 && (
+                <h2 className="section-title">
+                  <span>{section.title}</span>
+                </h2>
+              )}
+              {item}
+            </>
+          ),
+        });
+      });
+    });
+    return out;
+  };
+
+  const mainLead = [{ key: "header", node: header }];
+
+  const mainBlocks = toBlocks(
+    order.filter((id) => !sidebarIds.includes(id)),
+    mainLead
+  );
+  const sideBlocks = isSidebar
+    ? toBlocks(
+        order.filter((id) => sidebarIds.includes(id)),
+        [{ key: "contact", node: sideContact }]
+      )
+    : [];
 
   const measure = useCallback(() => {
-    const paper = measureRef.current?.querySelector(".resume-paper");
-    if (!paper) return;
-    const heights = Array.from(paper.children).map((c) => c.getBoundingClientRect().height);
-    const next = paginate(heights);
+    const root = measureRef.current;
+    if (!root) return;
+
+    const read = (selector) => {
+      const paper = root.querySelector(selector);
+      if (!paper) return [];
+      const heights = Array.from(paper.children).map((c) => c.getBoundingClientRect().height);
+      return paginate(heights);
+    };
+
+    const next = { main: read(".m-main"), side: read(".m-side") };
+
     setPages((prev) => (prev && JSON.stringify(prev) === JSON.stringify(next) ? prev : next));
   }, []);
 
-  // Re-measure after every render (state only updates when the split changes)
   useLayoutEffect(() => {
     measure();
   });
@@ -406,70 +492,98 @@ export default function ResumePreview({ resume, maxScale = 1, zoom = 1, onPagesC
     return () => observer.disconnect();
   }, [measure]);
 
-      // Fit-to-width factor; the zoom prop multiplies it
-      useEffect(() => {
-        const el = wrapperRef.current;
-        if (!el) return undefined;
-
-        const update = () => {
-          const width = el.clientWidth;
-          if (!width) return;
-          setFit(width / A4_WIDTH_PX);
-        };
-
-        update();
-        const observer = new ResizeObserver(update);
-        observer.observe(el);
-        return () => observer.disconnect();
-      }, []);
-
-  const pageList =
-    pages && pages.length ? pages : [blocks.map((_, i) => i)];
+  useEffect(() => {
+    let active = true;
+    ensureFont(font).then(() => {
+      if (active) measure();
+    });
+    return () => {
+      active = false;
+    };
+  }, [font, measure]);
 
   useEffect(() => {
-    if (onPagesChange) onPagesChange(pageList.length);
-  }, [pageList.length, onPagesChange]);
+    const el = wrapperRef.current;
+    if (!el) return undefined;
 
-  const totalHeight = pageList.length * SHEET_HEIGHT_PX + (pageList.length - 1) * PAGE_GAP_PX;
-  const paperStyle = { "--resume-color": currentColor };
+    const update = () => {
+      const width = el.clientWidth;
+      if (!width) return;
+      setFit(width / A4_WIDTH_PX);
+    };
+
+    update();
+    const observer = new ResizeObserver(update);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  const mainPages = pages && pages.main.length ? pages.main : [mainBlocks.map((_, i) => i)];
+  const sidePages = isSidebar ? (pages && pages.side.length ? pages.side : [sideBlocks.map((_, i) => i)]) : [];
+  const pageCount = Math.max(mainPages.length, sidePages.length, 1);
+
+  useEffect(() => {
+    if (onPagesChange) onPagesChange(pageCount);
+  }, [pageCount, onPagesChange]);
+
+  const totalHeight = pageCount * SHEET_HEIGHT_PX + (pageCount - 1) * PAGE_GAP_PX;
+
+  const renderColumn = (indexes, blocks) =>
+    (indexes || []).map(
+      (blockIndex, k) =>
+        blocks[blockIndex] && (
+          <div key={blocks[blockIndex].key} className={`resume-block ${k === 0 ? "page-first" : ""}`}>
+            {blocks[blockIndex].node}
+          </div>
+        )
+    );
 
   return (
-      <div className="preview-wrapper" ref={wrapperRef} style={{ overflow: zoom > 1 ? "visible" : "hidden" }}>
-      {/* Hidden, unscaled copy used only to measure block heights */}
+    <div className="preview-wrapper" ref={wrapperRef} style={{ overflow: zoom > 1 ? "visible" : "hidden" }}>
       <div className="resume-measure" ref={measureRef} aria-hidden="true">
-        <div className={`resume-paper template-${template}`} style={paperStyle}>
-          {blocks.map((b) => (
+        <div className={`resume-paper m-main ${className}`} style={style}>
+          {mainBlocks.map((b) => (
             <div key={b.key} className="resume-block">
               {b.node}
             </div>
           ))}
         </div>
-      </div>
-
-      <div
-        className="preview-scale-box"
-        style={{ width: A4_WIDTH_PX * scale, height: totalHeight * scale }}
-      >
-        <div className="preview-scale-inner" style={{ transform: `scale(${scale})`, width: A4_WIDTH_PX }}>
-          {/* #resume-paper holds the real A4 sheets; the PDF export reads them */}
-          <div id="resume-paper" className="resume-pages">
-            {pageList.map((indexes, p) => (
-              <div className="resume-sheet" key={p}>
-                <div className={`resume-paper template-${template}`} style={paperStyle}>
-                  {indexes.map(
-                    (blockIndex, k) =>
-                      blocks[blockIndex] && (
-                        <div
-                          key={blocks[blockIndex].key}
-                          className={`resume-block ${k === 0 ? "page-first" : ""}`}
-                        >
-                          {blocks[blockIndex].node}
-                        </div>
-                      )
-                  )}
-                </div>
+        {isSidebar && (
+          <div className={`resume-paper m-side is-side ${className}`} style={style}>
+            {sideBlocks.map((b) => (
+              <div key={b.key} className="resume-block">
+                {b.node}
               </div>
             ))}
+          </div>
+        )}
+      </div>
+
+      <div className="preview-scale-box" style={{ width: A4_WIDTH_PX * scale, height: totalHeight * scale }}>
+        <div className="preview-scale-inner" style={{ transform: `scale(${scale})`, width: A4_WIDTH_PX }}>
+          <div id={exportable ? "resume-paper" : undefined} className="resume-pages">
+            {Array.from({ length: pageCount }, (_, p) =>
+              isSidebar ? (
+                <div className={`resume-sheet sheet-2col ${className}`} style={style} key={p}>
+                  <aside className="sheet-side">
+                    <div className={`resume-paper is-side ${className}`} style={style}>
+                      {renderColumn(sidePages[p], sideBlocks)}
+                    </div>
+                  </aside>
+                  <div className="sheet-main">
+                    <div className={`resume-paper is-main ${className}`} style={style}>
+                      {renderColumn(mainPages[p], mainBlocks)}
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className={`resume-sheet ${className}`} style={style} key={p}>
+                  <div className={`resume-paper ${className}`} style={style}>
+                    {renderColumn(mainPages[p], mainBlocks)}
+                  </div>
+                </div>
+              )
+            )}
           </div>
         </div>
       </div>

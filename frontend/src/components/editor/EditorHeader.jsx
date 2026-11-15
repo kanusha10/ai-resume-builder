@@ -3,32 +3,12 @@ import { Link } from 'react-router-dom';
 import { ArrowLeft, Save, Download, Layout, Eye, Edit3, Palette } from 'lucide-react';
 import './EditorHeader.css';
 
-const TEMPLATES = [
-  { id: 'default', name: 'ATS Modern (Emma Format)' },
-  { id: 'technical', name: 'ATS Tech / Data Analyst (Aaditya)' },
-  { id: 'executive', name: 'ATS Executive (Shaded Banners)' },
-  { id: 'harvard', name: 'ATS Harvard Academic (Classic)' },
-  { id: 'minimal', name: 'ATS Minimalist (Tracked Serif)' }
-];
-
-const THEME_COLORS = [
-  '#0f172a', // Slate Dark / Black (Standard ATS)
-  '#1e3a8a', // Deep Navy
-  '#4f46e5', // Indigo
-  '#0f766e', // Deep Teal
-  '#15803d', // Forest Emerald
-  '#374151'  // Charcoal Gray
-];
-
 export default function EditorHeader({
   resumeTitle,
   resumeRole,
   onTitleChange,
   onRoleChange,
-  template,
-  onTemplateChange,
-  color,
-  onColorChange,
+  onOpenDesign,
   saving,
   onSave,
   onDownloadPdf,
@@ -64,37 +44,12 @@ export default function EditorHeader({
         </div>
       </div>
 
-      {/* Center: Template Dropdown, Color Circles, View Toggles */}
+      {/* Center: Design, View Toggles */}
       <div className="editor-nav-center">
-        {/* Template Selector Dropdown */}
-        <div className="nav-template-selector" title="Select ATS Template">
-          <Palette size={14} className="template-icon" />
-          <select
-            value={template || 'default'}
-            onChange={(e) => onTemplateChange(e.target.value)}
-            className="nav-template-select"
-          >
-            {TEMPLATES.map((t) => (
-              <option key={t.id} value={t.id}>
-                {t.name}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {/* Color Palette Quick Pick */}
-        <div className="nav-color-palette" title="Select Theme Color">
-          {THEME_COLORS.map((hex) => (
-            <button
-              key={hex}
-              type="button"
-              className={`nav-color-dot ${color === hex ? 'active' : ''}`}
-              style={{ backgroundColor: hex }}
-              onClick={() => onColorChange(hex)}
-              aria-label={`Select color ${hex}`}
-            />
-          ))}
-        </div>
+        <button type="button" className="nav-design-btn" onClick={onOpenDesign} title="Choose a template, fonts and colors">
+          <Palette size={15} />
+          <span>Design</span>
+        </button>
 
         {/* View Mode Toggle Switch */}
         <div className="view-mode-toggle">

@@ -47,11 +47,14 @@ import {
   Maximize2,
   Eye,
   Gauge,
+  SquarePlus,
 } from "lucide-react";
 
+import DesignStudio from "../components/design/DesignStudio";
+import CustomSectionEditor from "../components/editor/CustomSectionEditor";
 import "./ResumeEditor.css";
 
-const STEPS = [
+const BASE_STEPS = [
   { id: "personal", label: "Personal", icon: User },
   { id: "summary", label: "Summary", icon: FileText },
   { id: "education", label: "Education", icon: GraduationCap },
@@ -63,7 +66,6 @@ const STEPS = [
   { id: "achievements", label: "Awards", icon: Trophy },
   { id: "languages", label: "Languages", icon: Languages },
   { id: "involvement", label: "Activities", icon: Users },
-  { id: "layout", label: "Order", icon: ListOrdered },
 ];
 
 const INTERNSHIP_FIELDS = [
@@ -112,6 +114,11 @@ const INVOLVEMENT_FIELDS = [
     placeholder: "Organized coding bootcamps and coordinated tech symposium events...",
   },
 ];
+function customHasContent(section) {
+  if (section.type === "text") return Boolean(section.text?.trim());
+  if (section.type === "bullets") return (section.items || []).some((i) => i.text?.trim());
+  return (section.items || []).some((i) => i.title || i.subtitle || i.description || i.date);
+}
 const ZOOM_STEPS = [0.5, 0.75, 1, 1.25, 1.5, 2, 2.5];
 
 function ResumeEditor() {
@@ -147,6 +154,7 @@ function ResumeEditor() {
   const [zoom, setZoom] = useState(1);
   const [atsOpen, setAtsOpen] = useState(false);
   const [atsRecord, setAtsRecord] = useState(() => loadAnalysis(id || "new"));
+  const [designOpen, setDesignOpen] = useState(false);
 
   useEffect(() => {
     if (!id) return undefined;
@@ -223,7 +231,8 @@ function ResumeEditor() {
             achievements: parsedData?.achievements || data.achievements || [],
             languages: parsedData?.languages || data.languages || [],
             involvement: parsedData?.involvement || data.involvement || [],
-            sectionOrder: normalizeSectionOrder(parsedData?.sectionOrder || data.sectionOrder),
+            sectionOrder: normalizeSectionOrder(parsedData?.sectionOrder || data.sectionOrder,
+                (parsedData?.customSections || []).map((c) => c.id)),
             hiddenSections: parsedData?.hiddenSections || data.hiddenSections || [],
           });
         } catch (err) {
@@ -252,7 +261,8 @@ function ResumeEditor() {
             achievements: importedData.achievements || [],
             languages: importedData.languages || [],
             involvement: importedData.involvement || [],
-            sectionOrder: normalizeSectionOrder(importedData.sectionOrder),
+            sectionOrder: normalizeSectionOrder(importedData.sectionOrder,
+                (importedData.customSections || []).map((c) => c.id)),
             hiddenSections: importedData.hiddenSections || [],
           }));
         } catch (e) {
@@ -321,8 +331,24 @@ function ResumeEditor() {
     }
   };
 
+  const customSections = Array.isArray(resume.customSections) ? resume.customSections : [];
+
+  const steps = [
+    ...BASE_STEPS,
+    ...customSections.map((c) => ({
+      id: c.id,
+      label: (c.title || "").trim() || "Custom",
+      icon: SquarePlus,
+      custom: true,
+    })),
+    { id: "layout", label: "Order", icon: ListOrdered, meta: true },
+  ];
+
   const sectionHasContent = (sectionId) => {
-    switch (sectionId) {
+    const custom = customSections.find((c) => c.id === sectionId);
+    if (custom) return customHasContent(custom);
+
+    switch (sectionId)  {
       case "summary":
         return Boolean(resume.summary?.trim());
       case "skills":
@@ -335,14 +361,54 @@ function ResumeEditor() {
   };
 
   const isStepCompleted = (index) => {
-    const step = STEPS[index];
+    const step = steps[index];
     if (step.id === "personal") return Boolean(resume.personal?.fullName?.trim() && resume.personal?.email?.trim());
-    if (step.id === "layout") return false;
+    if (step.meta) return false;
     return sectionHasContent(step.id);
   };
 
-  const completedCount = STEPS.filter((s, i) => s.id !== "layout" && isStepCompleted(i)).length;
-  const progressPct = Math.round((completedCount / (STEPS.length - 1)) * 100);
+  const countableSteps = steps.filter((s) => !s.meta).length;
+  const completedCount = steps.filter((s, i) => !s.meta && isStepCompleted(i)).length;
+  const progressPct = Math.round((completedCount / countableSteps) * 100);
+
+  const addCustomSection = () => {
+    const id = `custom-${Date.now().toString(36)}`;
+    const section = { id, title: "", type: "entries", items: [], text: "" };
+
+    setResume((current) => {
+      const existing = Array.isArray(current.customSections) ? current.customSections : [];
+      return {
+        ...current,
+        customSections: [...existing, section],
+        sectionOrder: [...normalizeSectionOrder(current.sectionOrder, existing.map((c) => c.id)), id],
+      };
+    });
+
+    setCurrentStep(BASE_STEPS.length + customSections.length);
+    setViewMode((mode) => (mode === "preview" ? "both" : mode));
+  };
+
+  const updateCustomSection = (next) => {
+    setResume((current) => ({
+      ...current,
+      customSections: (current.customSections || []).map((c) => (c.id === next.id ? next : c)),
+    }));
+  };
+
+  const deleteCustomSection = (sectionId) => {
+    setResume((current) => ({
+      ...current,
+      customSections: (current.customSections || []).filter((c) => c.id !== sectionId),
+      sectionOrder: (current.sectionOrder || []).filter((id) => id !== sectionId),
+      hiddenSections: (current.hiddenSections || []).filter((id) => id !== sectionId),
+    }));
+    setCurrentStep(Math.max(0, currentStep - 1));
+  };
+
+  const openDesign = () => {
+    setDesignOpen(true);
+    setViewMode("both");
+  };
 
   async function saveResume() {
     setSaving(true);
@@ -394,7 +460,7 @@ function ResumeEditor() {
     setCurrentStep(index);
   };
   const openStepFromAts = (stepId) => {
-    const index = STEPS.findIndex((step) => step.id === stepId);
+    const index = steps.findIndex((step) => step.id === stepId);
 
     if (index >= 0) {
       setCurrentStep(index);
@@ -420,7 +486,7 @@ function ResumeEditor() {
     setError("");
     setPersonalValidated(false);
 
-    if (currentStep < STEPS.length - 1) {
+    if (currentStep < steps.length - 1) {
       setCurrentStep(currentStep + 1);
     } else {
       saveResume();
@@ -429,7 +495,7 @@ function ResumeEditor() {
 
   const goSkip = () => {
     setError("");
-    if (currentStep < STEPS.length - 1) setCurrentStep(currentStep + 1);
+    if (currentStep < steps.length - 1) setCurrentStep(currentStep + 1);
   };
 
   const goPrev = () => {
@@ -446,10 +512,12 @@ function ResumeEditor() {
     );
   }
 
-  const currentStepId = STEPS[currentStep].id;
+  const currentStepId = steps[currentStep]?.id;
+  const currentCustom = customSections.find((c) => c.id === currentStepId);
 
   const navProps = {
-    steps: STEPS,
+    steps,
+    onAdd: addCustomSection,
     currentStep,
     onSelect: goToStep,
     isCompleted: isStepCompleted,
@@ -482,10 +550,7 @@ function ResumeEditor() {
         resumeRole={resume.role}
         onTitleChange={(name) => updateResumeData({ name })}
         onRoleChange={(role) => updateResumeData({ role })}
-        template={resume.template}
-        onTemplateChange={(template) => updateResumeData({ template })}
-        color={resume.color}
-        onColorChange={(color) => updateResumeData({ color, primaryColor: color })}
+        onOpenDesign={openDesign}
         saving={saving}
         onSave={saveResume}
         onDownloadPdf={handleDownloadPdf}
@@ -714,6 +779,15 @@ function ResumeEditor() {
                   />
                 )}
 
+                {currentCustom && (
+                  <CustomSectionEditor
+                    key={currentCustom.id}
+                    section={currentCustom}
+                    onChange={updateCustomSection}
+                    onDelete={() => deleteCustomSection(currentCustom.id)}
+                  />
+                )}
+
                 {currentStepId === "layout" && (
                   <div className="step-content">
                     <div className="step-heading">
@@ -721,6 +795,7 @@ function ResumeEditor() {
                       <p>Arrange the sections of your resume in the order recruiters should read them.</p>
                     </div>
                     <SectionOrderPanel
+                      customSections={customSections}
                       order={resume.sectionOrder}
                       hidden={resume.hiddenSections || []}
                       hasContent={sectionHasContent}
@@ -740,9 +815,9 @@ function ResumeEditor() {
 
               <div className="form-footer-center">
                 <span className="step-counter-text">
-                  Step {currentStep + 1} of {STEPS.length}
+                  Step {currentStep + 1} of {steps.length}
                 </span>
-                {currentStep > 0 && currentStep < STEPS.length - 1 && (
+                {currentStep > 0 && currentStep < steps.length - 1 && (
                   <button type="button" className="btn-skip-step-prominent" onClick={goSkip}>
                     <FastForward size={13} />
                     <span>Skip</span>
@@ -757,7 +832,7 @@ function ResumeEditor() {
                   <span>{saving ? "Saving..." : "Save"}</span>
                 </button>
                 <button type="button" className="btn-wizard-nav next" onClick={goNext}>
-                  <span>{currentStep === STEPS.length - 1 ? "Finish" : "Next"}</span>
+                  <span>{currentStep === steps.length - 1 ? "Finish" : "Next"}</span>
                   <ChevronRight size={16} />
                 </button>
               </div>
@@ -828,6 +903,12 @@ function ResumeEditor() {
         record={atsRecord}
         onRecordChange={handleAtsRecord}
         onGoToStep={openStepFromAts}
+      />
+      <DesignStudio
+        open={designOpen}
+        onClose={() => setDesignOpen(false)}
+        resume={resume}
+        onChange={updateResumeData}
       />
     </div>
   );

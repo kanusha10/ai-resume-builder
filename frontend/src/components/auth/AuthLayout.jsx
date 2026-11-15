@@ -1,11 +1,16 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { FileText, CheckCircle2, Shield, Zap } from 'lucide-react';
+import { FileText, CheckCircle2, Shield, Zap, ArrowLeft } from 'lucide-react';
 import './AuthLayout.css';
+import "./AuthExtras.css";
 
 export default function AuthLayout({ children, title, subtitle }) {
   return (
     <div className="auth-wrapper">
+        <Link to="/" className="auth-back-home">
+                                    <ArrowLeft size={15} />
+                                    Back to home
+                                  </Link>
       <div className="auth-container">
         {/* Left column */}
         <div className="auth-brand-side">

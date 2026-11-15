@@ -1,143 +1,243 @@
-/* ================= PAGES / SCALING ================= */
 .preview-wrapper { position: relative; width: 100%; max-width: 100%; }
 .preview-scale-box { margin: 0 auto; position: relative; overflow: hidden; }
 .preview-scale-inner { transform-origin: top left; }
 
-.resume-measure { position: absolute; left: -99999px; top: 0; width: 182mm; visibility: hidden; pointer-events: none; }
+.resume-measure { position: absolute; left: -99999px; top: 0; width: 210mm; visibility: hidden; pointer-events: none; }
+.resume-measure .resume-paper { width: 182mm; }
+.resume-measure .resume-paper.layout-sidebar.m-main { width: calc(210mm - var(--sbw) - 22mm); }
+.resume-measure .resume-paper.layout-sidebar.m-side { width: calc(var(--sbw) - 14mm); }
 
-/* Visible split between pages = gap + shadow */
 .resume-pages { display: flex; flex-direction: column; gap: 22px; }
 
 .resume-sheet {
   position: relative; flex: none; box-sizing: border-box;
   width: 210mm; height: 297mm; padding: 10mm 14mm; overflow: hidden;
   background: #fff; box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.08), 0 8px 26px rgba(15, 23, 42, 0.28);
+  -webkit-print-color-adjust: exact; print-color-adjust: exact;
 }
+.resume-sheet * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 
 .resume-block { display: flow-root; }
 .resume-block.page-first h2.section-title { margin-top: 0 !important; }
 
-/* ================= PAPER BASE ================= */
-/* --resume-color is used ONLY by section headers (see h2.section-title rules) */
+.resume-sheet.sheet-2col { display: grid; grid-template-columns: var(--sbw) minmax(0, 1fr); padding: 0; }
+.sheet-side { background: var(--rsb); color: var(--rsbt); padding: 10mm 7mm; min-width: 0; }
+.sheet-main { padding: 10mm 12mm 10mm 10mm; min-width: 0; }
+.sheet-2col .resume-paper { background: transparent; }
+
 .resume-paper {
-  --resume-color: #0f172a;
-  --accent-soft: rgba(15, 23, 42, 0.07);
-  width: 100%; box-sizing: border-box; padding: 0; margin: 0; background: #fff; color: #111827;
-  font-family: Calibri, Carlito, "Segoe UI", Arial, Helvetica, sans-serif;
-  font-size: 10pt; line-height: 1.4; overflow-wrap: anywhere;
+  --rc: #0f172a; --ras: #e7e9ee; --rcon: #ffffff; --rtext: #111827; --rmuted: #6b7280; --rsg: 10px;
+  width: 100%; box-sizing: border-box; padding: 0; margin: 0; background: #fff;
+  color: var(--rtext);
+  font-family: var(--rf, Calibri, Carlito, "Segoe UI", Arial, Helvetica, sans-serif);
+  font-size: var(--rs, 9.5pt); line-height: var(--rlh, 1.4); overflow-wrap: anywhere;
   -webkit-print-color-adjust: exact; print-color-adjust: exact;
-}
-@supports (background: color-mix(in srgb, red 10%, white)) {
-  .resume-paper { --accent-soft: color-mix(in srgb, var(--resume-color) 10%, #ffffff); }
 }
 .resume-paper *, .resume-paper *::before, .resume-paper *::after { box-sizing: border-box; }
 
-/* ---------- Header (neutral colors) ---------- */
 .resume-header { padding-bottom: 8px; }
 .resume-header-inner { display: flex; align-items: center; gap: 16px; }
 .resume-header-text { flex: 1; min-width: 0; }
 .resume-photo { flex: none; width: 22mm; height: 22mm; object-fit: cover; border-radius: 50%; border: 1px solid #d1d5db; }
-.resume-name { margin: 0; font-weight: 800; line-height: 1.12; color: var(--resume-color); }
-.resume-role-sub { margin-top: 3px; font-weight: 600; color: #4b5563; }
-.resume-contact-bar { display: flex; flex-wrap: wrap; align-items: center; margin-top: 6px; font-size: 9pt; color: #374151; row-gap: 2px; }
+.ph-rounded .resume-photo { border-radius: 14%; }
+.ph-square .resume-photo { border-radius: 0; }
+.resume-name { margin: 0; font-size: 2.5em; font-weight: 800; line-height: 1.12; color: var(--rc); }
+.resume-role-sub { margin-top: 3px; font-size: 1.15em; font-weight: 600; color: var(--rmuted); }
+.resume-contact-bar { display: flex; flex-wrap: wrap; align-items: center; margin-top: 6px; font-size: 0.95em; color: var(--rtext); row-gap: 2px; }
 .contact-item { display: inline-flex; align-items: center; }
 .contact-item + .contact-item::before { content: "|"; margin: 0 8px; color: #9ca3af; font-weight: 400; }
 
-/* ---------- Links: neutral, underlined, clickable ---------- */
-.resume-link {
-  color: inherit; font-weight: 400; text-decoration: underline;
-  text-decoration-color: #9ca3af; text-underline-offset: 2px; text-decoration-thickness: 1px;
-}
+.resume-link { color: inherit; font-weight: 400; text-decoration: underline; text-decoration-color: #9ca3af; text-underline-offset: 2px; text-decoration-thickness: 1px; }
 .resume-link:hover { text-decoration-color: currentColor; }
 
-/* ---------- Section heading: the ONLY colored element ---------- */
 .resume-paper h2.section-title {
-  font-size: 9.5pt !important; line-height: 1.25 !important; font-weight: 700 !important;
-  text-transform: uppercase; margin: 10px 0 5px; padding: 0 0 2px;
-  color: var(--resume-color); break-after: avoid; page-break-after: avoid;
+  font-size: 1em !important; line-height: 1.25 !important; font-weight: 700 !important;
+  letter-spacing: 0.06em; margin: var(--rsg) 0 5px; padding: 0 0 2px;
+  color: var(--rc); break-after: avoid; page-break-after: avoid;
 }
+.resume-paper.up h2.section-title { text-transform: uppercase; }
 
-/* ---------- Content blocks (neutral) ---------- */
-.resume-summary-text { margin: 0 0 4px; font-size: 9.5pt; text-align: justify; }
-.skill-line { font-size: 9.5pt; margin-bottom: 2px; }
-.skill-cat-name { font-weight: 700; color: #111827; }
-.resume-entry { margin-bottom: 6px; }
+.resume-summary-text { margin: 0 0 4px; font-size: 1em; text-align: justify; }
+.resume-summary-text.pre-line { white-space: pre-line; text-align: left; }
+.skill-line { font-size: 1em; margin-bottom: 2px; }
+.skill-cat-name { font-weight: 700; color: var(--rtext); }
+.resume-entry { margin-bottom: calc(var(--rsg) * 0.6); }
 .entry-line { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
-.entry-title { font-weight: 700; font-size: 10pt; color: #111827; }
+.entry-title { font-weight: 700; font-size: 1.05em; color: var(--rtext); }
 .entry-title-wrap { min-width: 0; }
-.entry-tech { font-size: 9.5pt; color: #4b5563; }
-.entry-right { flex: none; font-size: 9pt; color: #4b5563; white-space: nowrap; }
-.entry-subline { font-size: 9.5pt; color: #374151; }
-.entry-grade { font-size: 9pt; color: #4b5563; }
-.entry-desc { margin: 2px 0 0; font-size: 9.5pt; }
+.entry-tech { font-size: 1em; color: var(--rmuted); }
+.entry-right { flex: none; font-size: 0.95em; color: var(--rmuted); white-space: nowrap; }
+.entry-subline { font-size: 1em; color: var(--rtext); opacity: 0.85; }
+.entry-grade { font-size: 0.95em; color: var(--rmuted); }
+.entry-desc { margin: 2px 0 0; font-size: 1em; }
 .ats-bullet-list { margin: 2px 0 0; padding: 0; list-style: none; }
-.ats-bullet-item { position: relative; padding-left: 14px; margin-bottom: 1.5px; font-size: 9.5pt; line-height: 1.38; }
-.ats-bullet-item::before { content: "•"; position: absolute; left: 4px; top: 0; color: #111827; }
-.languages-inline-row { font-size: 9.5pt; }
+.ats-bullet-item { position: relative; padding-left: 14px; margin-bottom: 1.5px; font-size: 1em; line-height: 1.38; }
+.ats-bullet-item::before { content: "•"; position: absolute; left: 4px; top: 0; color: var(--rtext); }
+.languages-inline-row { font-size: 1em; }
 
-/* =====================================================================
-   1. DEFAULT "Modern": centered header, neutral rule, colored ruled headings
-   ===================================================================== */
-.template-default .resume-header { text-align: center; border-bottom: 1.5px solid #111827; margin-bottom: 2px; }
-.template-default .resume-header-inner { justify-content: center; }
-.template-default .resume-name { font-size: 24pt; letter-spacing: 0.01em; }
-.template-default .resume-role-sub { font-size: 11pt; }
-.template-default .resume-contact-bar { justify-content: center; }
-.template-default h2.section-title { border-bottom: 1.5px solid var(--resume-color); letter-spacing: 0.06em; }
+.hdr-center .resume-header { text-align: center; border-bottom: 1.5px solid var(--rtext); margin-bottom: 2px; }
+.hdr-center .resume-header-inner, .hdr-center-plain .resume-header-inner { justify-content: center; }
+.hdr-center .resume-contact-bar, .hdr-center-plain .resume-contact-bar { justify-content: center; }
+.hdr-center-plain .resume-header { text-align: center; }
+.hdr-center-plain .resume-name { font-size: 2.2em; font-weight: 700; font-variant: small-caps; letter-spacing: 0.07em; color: var(--rc); }
+.hdr-center-plain .resume-role-sub { color: var(--rtext); font-weight: 400; font-style: italic; font-size: 1.05em; }
 
-/* =====================================================================
-   2. TECHNICAL "Developer": left header, tinted heading bars, dense
-   ===================================================================== */
-.resume-paper.template-technical { font-family: Arial, Helvetica, sans-serif; font-size: 9.5pt; line-height: 1.36; }
-.template-technical .resume-header { border-bottom: 1px solid #d1d5db; margin-bottom: 2px; }
-.template-technical .resume-name { font-size: 22pt; }
-.template-technical .resume-role-sub { color: #111827; font-size: 10.5pt; }
-.template-technical h2.section-title { background: var(--accent-soft); border-left: 4px solid var(--resume-color); padding: 3px 0 3px 9px; letter-spacing: 0.08em; }
-.template-technical .resume-entry { margin-bottom: 5px; }
+.hdr-left .resume-header { border-bottom: 1px solid #d1d5db; margin-bottom: 2px; }
+.hdr-left .resume-name { font-size: 2.3em; }
+.hdr-left .resume-role-sub { color: var(--rtext); font-size: 1.1em; }
 
-/* =====================================================================
-   3. EXECUTIVE "Corporate": serif, neutral heavy rule, spaced headings
-   ===================================================================== */
-.resume-paper.template-executive { font-family: Georgia, "Times New Roman", serif; line-height: 1.46; }
-.template-executive .resume-header { border-bottom: 3px solid #111827; padding-bottom: 10px; margin-bottom: 4px; }
-.template-executive .resume-name { font-size: 25pt; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; }
-.template-executive .resume-role-sub { font-style: italic; font-weight: 400; font-size: 11pt; color: #374151; }
-.template-executive h2.section-title { letter-spacing: 0.16em; border-bottom: 1px solid var(--resume-color); margin: 13px 0 6px; }
-.template-executive .entry-subline, .template-executive .entry-right { font-style: italic; }
-.template-executive .resume-entry { margin-bottom: 8px; }
+.hdr-left-heavy .resume-header { border-bottom: 3px solid var(--rtext); padding-bottom: 10px; margin-bottom: 4px; }
+.hdr-left-heavy .resume-name { font-size: 2.6em; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; }
+.hdr-left-heavy .resume-role-sub { font-style: italic; font-weight: 400; color: #374151; }
 
-/* =====================================================================
-   4. HARVARD "Classic": Times, centered small-caps name, thin rules
-   ===================================================================== */
-.resume-paper.template-harvard { font-family: "Times New Roman", Times, serif; font-size: 10.5pt; line-height: 1.34; }
-.template-harvard .resume-header { text-align: center; }
-.template-harvard .resume-header-inner { justify-content: center; }
-.template-harvard .resume-name { font-size: 22pt; font-weight: 700; font-variant: small-caps; letter-spacing: 0.07em; }
-.template-harvard .resume-role-sub { color: #111827; font-weight: 400; font-style: italic; font-size: 10.5pt; }
-.template-harvard .resume-contact-bar { justify-content: center; font-size: 10pt; }
-.template-harvard h2.section-title { border-bottom: 1px solid var(--resume-color); letter-spacing: 0.05em; margin: 9px 0 4px; }
-.template-harvard .entry-right, .template-harvard .entry-subline { font-style: italic; font-size: 10pt; color: #111827; }
-.template-harvard .entry-title { font-size: 10.5pt; }
-.template-harvard .ats-bullet-item, .template-harvard .resume-summary-text, .template-harvard .skill-line { font-size: 10pt; }
+.hdr-bar .resume-header { border-left: 5px solid var(--rtext); padding: 2px 0 2px 14px; margin-bottom: 6px; }
+.hdr-bar .resume-name { font-size: 2.7em; font-weight: 700; letter-spacing: -0.01em; line-height: 1.05; }
+.hdr-bar .resume-role-sub { color: var(--rmuted); font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; font-size: 0.9em; margin-top: 6px; }
+.hdr-bar .resume-contact-bar { color: var(--rmuted); margin-top: 8px; }
+.hdr-bar .resume-photo { border: 0; }
 
-/* =====================================================================
-   5. MINIMAL "Clean Modern": neutral bar header, gray badges, skills grid
-   ===================================================================== */
-.resume-paper.template-minimal { font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 9.5pt; line-height: 1.5; color: #1f2937; }
-.template-minimal .resume-header { border-left: 5px solid #111827; padding: 2px 0 2px 14px; margin-bottom: 6px; }
-.template-minimal .resume-name { font-size: 26pt; font-weight: 700; letter-spacing: -0.01em; line-height: 1.05; }
-.template-minimal .resume-role-sub { color: #6b7280; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; font-size: 8.5pt; margin-top: 6px; }
-.template-minimal .resume-contact-bar { color: #6b7280; margin-top: 8px; }
-.template-minimal h2.section-title {
-  letter-spacing: 0.2em; margin: 16px 0 8px; padding-bottom: 5px;
-  background:
-    linear-gradient(var(--resume-color), var(--resume-color)) left bottom / 38px 2px no-repeat,
-    linear-gradient(#e5e7eb, #e5e7eb) left bottom / 100% 1px no-repeat;
+.hdr-banner .resume-header { margin: -10mm -14mm 4mm; padding: 10mm 14mm 9mm; background: var(--rc); color: var(--rcon); }
+.hdr-banner .resume-name { color: var(--rcon); font-size: 2.6em; }
+.hdr-banner .resume-role-sub { color: var(--rcon); opacity: 0.88; }
+.hdr-banner .resume-contact-bar { color: var(--rcon); }
+.hdr-banner .contact-item + .contact-item::before { color: var(--rcon); opacity: 0.6; }
+.hdr-banner .resume-photo { border: 2px solid var(--rcon); }
+
+.hdr-bold .resume-header { border: 0; padding-bottom: 6px; }
+.hdr-bold .resume-header::after { content: ""; display: block; width: 36mm; height: 4px; margin-top: 8px; background: var(--rc); }
+.hdr-bold .resume-name { font-size: 3em; font-weight: 800; letter-spacing: -0.02em; line-height: 1.02; }
+.hdr-bold .resume-role-sub { color: var(--rtext); letter-spacing: 0.06em; text-transform: uppercase; font-size: 1em; }
+
+.hdr-main .resume-header { border-bottom: 1px solid #e5e7eb; margin-bottom: 4px; }
+.hdr-main .resume-name { font-size: 2.4em; }
+.hdr-main .resume-role-sub { color: var(--rc); font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; font-size: 0.95em; margin-top: 5px; }
+
+.hd-rule h2.section-title { border-bottom: 1.5px solid var(--rc); }
+.hd-rule-wide h2.section-title { letter-spacing: 0.16em; border-bottom: 1px solid var(--rc); margin-top: calc(var(--rsg) * 1.3); }
+.hd-bar h2.section-title { background: var(--ras); border-left: 4px solid var(--rc); padding: 3px 0 3px 9px; letter-spacing: 0.08em; }
+.hd-short h2.section-title {
+  letter-spacing: 0.2em; padding-bottom: 5px; margin-top: calc(var(--rsg) * 1.5); margin-bottom: 8px;
+  background: linear-gradient(var(--rc), var(--rc)) left bottom / 38px 2px no-repeat, linear-gradient(#e5e7eb, #e5e7eb) left bottom / 100% 1px no-repeat;
 }
-.template-minimal .resume-entry { margin-bottom: 9px; }
-.template-minimal .entry-title { font-weight: 700; }
-.template-minimal .entry-right { background: #f3f4f6; color: #374151; font-weight: 600; font-size: 8.5pt; padding: 1px 9px; border-radius: 999px; }
-.template-minimal .entry-subline { color: #6b7280; font-weight: 500; }
-.template-minimal .skill-line { display: grid; grid-template-columns: 31mm minmax(0, 1fr); column-gap: 10px; margin-bottom: 4px; }
-.template-minimal .ats-bullet-item::before { content: "▪"; left: 3px; font-size: 8pt; top: 1px; }
-.template-minimal .resume-photo { border: 0; }
+.hd-plain h2.section-title { letter-spacing: 0.1em; border-bottom: 1px solid #e5e7eb; }
+.hd-pill h2.section-title span { display: inline-block; background: var(--rc); color: var(--rcon); padding: 2px 13px; border-radius: 999px; letter-spacing: 0.08em; }
+.hd-pill h2.section-title { margin-bottom: 6px; }
+.hd-band h2.section-title { background: var(--rc); color: var(--rcon) !important; padding: 3px 9px; letter-spacing: 0.1em; }
+.hd-dot h2.section-title { display: flex; align-items: center; gap: 8px; }
+.hd-dot h2.section-title::before { content: ""; flex: none; width: 9px; height: 9px; border-radius: 50%; background: var(--rc); }
+.hd-dot h2.section-title::after { content: ""; flex: 1; height: 1px; background: #d1d5db; }
+
+.ent-timeline .resume-entry { position: relative; margin-bottom: 0; padding: 0 0 calc(var(--rsg) * 0.7) 16px; border-left: 2px solid #d1d5db; margin-left: 4px; }
+.ent-timeline .resume-entry::before { content: ""; position: absolute; left: -6px; top: 0.4em; width: 10px; height: 10px; border-radius: 50%; background: var(--rc); border: 2px solid #fff; }
+
+.ent-datecol .resume-entry { display: grid; grid-template-columns: 27mm minmax(0, 1fr); column-gap: 4mm; }
+.ent-datecol .entry-head, .ent-datecol .entry-line { display: contents; }
+.ent-datecol .entry-right { grid-column: 1; grid-row: 1 / span 3; align-self: start; text-align: left; white-space: normal; font-weight: 600; }
+.ent-datecol .entry-title, .ent-datecol .entry-title-wrap, .ent-datecol .entry-subline,
+.ent-datecol .ats-bullet-list, .ent-datecol .entry-desc, .ent-datecol .entry-grade { grid-column: 2; }
+
+.sk-chips .skill-line { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 6px; margin-bottom: 5px; }
+.sk-chips .skill-cat-items { display: inline-flex; flex-wrap: wrap; gap: 4px; }
+.sk-chips .skill-chip { background: var(--ras); padding: 1px 9px; border-radius: 999px; font-size: 0.95em; }
+.sk-chips .skill-sep { display: none; }
+.sk-grid .skill-line { display: grid; grid-template-columns: 31mm minmax(0, 1fr); column-gap: 10px; margin-bottom: 4px; }
+
+.tpl-technical .resume-entry { margin-bottom: 5px; }
+.tpl-executive .entry-subline, .tpl-executive .entry-right { font-style: italic; }
+.tpl-executive .resume-entry { margin-bottom: 8px; }
+.tpl-harvard .entry-right, .tpl-harvard .entry-subline { font-style: italic; color: var(--rtext); }
+.tpl-harvard h2.section-title { margin-top: 9px; }
+.tpl-minimal { color: #1f2937; }
+.tpl-minimal .resume-entry { margin-bottom: 9px; }
+.tpl-minimal .entry-right { background: #f3f4f6; color: #374151; font-weight: 600; font-size: 0.9em; padding: 1px 9px; border-radius: 999px; }
+.tpl-minimal .entry-subline { color: var(--rmuted); font-weight: 500; }
+.tpl-minimal .ats-bullet-item::before { content: "▪"; left: 3px; font-size: 0.85em; top: 1px; }
+.tpl-minimal .resume-photo { border: 0; }
+
+.resume-paper.is-side { color: var(--rsbt); }
+.resume-paper.is-side .resume-link, .resume-paper.is-side .skill-cat-name,
+.resume-paper.is-side .entry-title, .resume-paper.is-side .entry-subline,
+.resume-paper.is-side .ats-bullet-item::before { color: var(--rsbt); }
+.resume-paper.is-side .resume-link { text-decoration-color: currentColor; }
+.resume-paper.is-side h2.section-title, .resume-paper.is-side h2.section-title span {
+  background: none; border-radius: 0; color: var(--rsbt) !important; display: block; padding: 0;
+}
+.resume-paper.is-side h2.section-title {
+  font-size: 0.95em !important; letter-spacing: 0.14em; margin: 16px 0 7px; padding-bottom: 4px;
+  border: 0; border-bottom: 1px solid rgba(128, 128, 128, 0.55);
+  border-bottom: 1px solid color-mix(in srgb, currentColor 45%, transparent);
+}
+.resume-paper.is-side h2.section-title::before, .resume-paper.is-side h2.section-title::after { display: none; }
+.resume-paper.is-side .resume-block.page-first h2.section-title { margin-top: 0 !important; }
+.sb-photo { display: block; width: 34mm; height: 34mm; margin: 0 auto 12px; border: 3px solid rgba(255, 255, 255, 0.65); }
+.sb-soft .sb-photo { border-color: rgba(0, 0, 0, 0.08); }
+.sb-contact-list { font-size: 0.95em; }
+.sb-contact-item { margin-bottom: 5px; word-break: break-word; }
+.is-side .skill-line { margin-bottom: 7px; }
+.is-side .skill-cat-name { display: block; }
+.is-side .skill-cat-items { display: block; font-size: 0.95em; }
+.is-side.sk-chips .skill-line, .is-side.sk-grid .skill-line { display: block; }
+.is-side .lang-item { display: block; margin-bottom: 2px; }
+.is-side .lang-sep { display: none; }
+.is-side .ats-bullet-item { font-size: 0.95em; }
+.is-side .resume-summary-text { text-align: left; }
+
+/* ===== extra heading style ===== */
+.hd-lines h2.section-title { display: flex; align-items: center; justify-content: center; gap: 12px; letter-spacing: 0.2em; font-weight: 600 !important; margin-top: calc(var(--rsg) * 1.4); }
+.hd-lines h2.section-title::before, .hd-lines h2.section-title::after { content: ""; flex: 1; height: 1px; background: var(--rc); opacity: 0.45; }
+
+/* ===== right sidebar ===== */
+.sheet-2col.sbpos-right { grid-template-columns: minmax(0, 1fr) var(--sbw); }
+.sbpos-right .sheet-side { order: 2; }
+.sbpos-right .sheet-main { padding: 10mm 10mm 10mm 12mm; }
+
+/* ===== developer: top accent bar ===== */
+.resume-sheet.tpl-technical::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 5mm; background: var(--rc); }
+
+/* ===== executive: double rule ===== */
+.hdr-left-heavy .resume-header { border-bottom: 4px double var(--rtext); }
+
+/* ===== elegant ===== */
+.hdr-elegant .resume-header { text-align: center; border: 0; padding-bottom: 6px; }
+.hdr-elegant .resume-header-inner { justify-content: center; }
+.hdr-elegant .resume-name { font-size: 2.7em; font-weight: 400; letter-spacing: 0.1em; font-variant: small-caps; }
+.hdr-elegant .resume-role-sub { color: var(--rmuted); font-style: italic; font-weight: 400; letter-spacing: 0.04em; }
+.hdr-elegant .resume-contact-bar { justify-content: center; }
+.hdr-elegant .resume-header::after { content: "\2726"; display: block; margin-top: 7px; color: var(--rc); font-size: 1em; letter-spacing: 0.6em; text-indent: 0.6em; }
+.tpl-elegant .entry-right, .tpl-elegant .entry-subline { font-style: italic; }
+.tpl-elegant .entry-title { font-weight: 600; }
+
+/* ===== duo: split header ===== */
+.hdr-duo .resume-header { background: var(--ras); border-top: 4px solid var(--rc); padding: 11px 14px; margin-bottom: 6px; }
+.hdr-duo .resume-header-inner { display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 18px; align-items: center; }
+.hdr-duo .resume-header-text { display: contents; }
+.hdr-duo .resume-name { grid-column: 1; font-size: 2.4em; }
+.hdr-duo .resume-role-sub { grid-column: 1; color: var(--rc); font-weight: 700; }
+.hdr-duo .resume-contact-bar { grid-column: 2; grid-row: 1 / span 2; flex-direction: column; align-items: flex-end; margin: 0; padding-left: 16px; border-left: 2px solid var(--rc); text-align: right; font-size: 0.92em; }
+.hdr-duo .contact-item + .contact-item::before { display: none; }
+
+/* ===== edge: colored page edge + numbered sections ===== */
+.resume-sheet.tpl-edge { padding: 10mm 9mm 10mm 19mm; }
+.resume-sheet.tpl-edge::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 8mm; background: var(--rc); }
+.resume-sheet.tpl-edge:first-child { counter-reset: rsec; }
+.tpl-edge h2.section-title { border: 0; border-bottom: 1px solid #e5e7eb; }
+.tpl-edge h2.section-title::before { counter-increment: rsec; content: counter(rsec, decimal-leading-zero); display: inline-block; margin-right: 9px; padding: 1px 7px; border-radius: 4px; background: var(--rc); color: var(--rcon); font-size: 0.85em; letter-spacing: 0; vertical-align: 1px; }
+.tpl-edge .resume-name { font-size: 2.6em; }
+
+/* ===== timeline: date chips ===== */
+.ent-timeline .entry-right { background: var(--ras); color: var(--rc); padding: 1px 9px; border-radius: 999px; font-weight: 700; font-size: 0.9em; }
+
+/* ===== split dates ===== */
+.ent-datecol .entry-right { color: var(--rc); font-weight: 700; }
+.ent-datecol .resume-entry { padding-top: 5px; border-top: 1px solid #eef1f5; }
+
+/* ===== cards ===== */
+.resume-sheet.tpl-card { background: var(--ras); }
+.tpl-card .resume-header { background: #fff; border-radius: 10px; border-left: 6px solid var(--rc); padding: 11px 15px; margin-bottom: 4px; box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08); }
+.tpl-card .resume-name { font-size: 2.3em; }
+.tpl-card .resume-role-sub { color: var(--rc); font-weight: 700; }
+.tpl-card h2.section-title { border: 0; margin-top: calc(var(--rsg) * 1.2); letter-spacing: 0.12em; }
+.tpl-card .resume-entry, .tpl-card .resume-block > .ats-bullet-list, .tpl-card .resume-block > .skill-line,
+.tpl-card .resume-block > .resume-summary-text, .tpl-card .resume-block > .languages-inline-row {
+  background: #fff; border: 1px solid #e3e8ef; border-radius: 8px; padding: 7px 11px; margin-bottom: 6px; box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
+}
